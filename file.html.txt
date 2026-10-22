@@ -1,0 +1,3066 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>My Mobility Journal</title>
+<style>
+  /* Reset & base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: #F5EFE6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #594536;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  a, button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+  button:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid #A9B6A0;
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 {
+    margin: 0 0 0.3em 0;
+    font-family: 'Georgia', serif;
+    color: #8B6F57;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 1em;
+  }
+  p {
+    margin: 0.3em 0;
+  }
+  /* Scrollbar for Webkit */
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #FFFCF7;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #E8C3CC;
+    border-radius: 10px;
+  }
+
+  /* Layout */
+  #app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0.8rem 1rem 3rem 1rem;
+  }
+  header {
+    position: sticky;
+    top: 0; left: 0; right: 0;
+    background: #FFFCF7;
+    border-bottom: 1px solid #E6D5C3;
+    padding: 1rem 1rem 0.5rem 1rem;
+    z-index: 1000;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.05);
+  }
+  header h1 {
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    color: #8B6F57;
+  }
+  header .subtitle {
+    font-size: 1rem;
+    font-style: italic;
+    color: #A9B6A0;
+    margin-bottom: 0.5em;
+  }
+  header .top-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #594536;
+    align-items: center;
+  }
+  #navigationButtons {
+    margin-top: 0.8em;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  #navigationButtons button {
+    background: #E8C3CC;
+    color: #594536;
+    padding: 0.5em 1em;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 1px 1px 4px rgb(139 111 87 / 0.4);
+    transition: background-color 0.3s ease;
+  }
+  #navigationButtons button:hover, #navigationButtons button:focus {
+    background: #F6E4E7;
+  }
+
+  /* Cards */
+  section.card {
+    background: #FFFCF7;
+    border: 1px solid #E6D5C3;
+    border-radius: 18px;
+    box-shadow: 0 4px 7px rgb(182 157 126 / 0.2);
+    margin-top: 2rem;
+    padding: 1.4rem 1.8rem 1.8rem 1.8rem;
+  }
+  section.card.decorated {
+    background-image:
+      repeating-radial-gradient(circle at 5px 5px, #E6D5C3 0, #E6D5C3 2px, transparent 3px, transparent 7px),
+      repeating-linear-gradient(90deg, #F5EFE6 0, #F5EFE6 10px, #E6D5C3 11px, #F5EFE6 12px);
+  }
+
+  /* Labels and checkboxes */
+  label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1rem;
+    gap: 0.6em;
+    cursor: pointer;
+    user-select: none;
+  }
+  input[type="checkbox"] {
+    appearance: none;
+    width: 1.3em;
+    height: 1.3em;
+    border-radius: 6px;
+    border: 2px solid #8B6F57;
+    background-color: #FFFCF7;
+    position: relative;
+    box-shadow: inset 0 0 4px #E6D5C3;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  input[type="checkbox"]:checked {
+    background-color: #A9B6A0;
+    border-color: #A9B6A0;
+  }
+  input[type="checkbox"]:checked::after {
+    content: "✓";
+    color: #FFFCF7;
+    position: absolute;
+    font-weight: 800;
+    font-size: 1.1em;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -53%);
+    user-select: none;
+  }
+  input[type="checkbox"]:focus-visible {
+    outline: 2px solid #A9B6A0;
+    outline-offset: 3px;
+  }
+
+  /* Buttons for chronos and controls */
+  button.chrono-btn {
+    display: inline-block;
+    background: #E8C3CC;
+    color: #594536;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.3em 1em;
+    margin-left: 0.8em;
+    box-shadow: 0 1px 3px rgb(139 111 87 / 0.3);
+    transition: background-color 0.3s ease;
+  }
+  button.chrono-btn:hover, button.chrono-btn:focus {
+    background: #F6E4E7;
+  }
+
+  /* Flex wrappers */
+  .flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1.2rem;
+  }
+  .flex-wrap-gap {
+    gap: 1rem 1.2rem;
+    flex-wrap: wrap;
+  }
+  .space-between {
+    justify-content: space-between;
+  }
+  .centered {
+    justify-content: center;
+  }
+
+  /* Scroll horizontal on small */
+  .scroll-x-container {
+    overflow-x: auto;
+  }
+
+  /* Timers */
+  .timer-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #8B6F57;
+    font-size: 1.1rem;
+    min-width: 80px;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    width: 100%;
+    height: 1.1rem;
+    background: #E6D5C3;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 6px rgb(139 111 87 / 0.15);
+    margin-top: 0.3rem;
+  }
+  .progress-bar {
+    height: 100%;
+    background-color: #E8C3CC;
+    width: 0%;
+    border-radius: 12px 0 0 12px;
+    transition: width 0.3s ease;
+  }
+  .progress-bar.complete {
+    background-color: #A9B6A0;
+  }
+
+  /* Scroll within cards for mobiles */
+  .scroll-section {
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Calendar */
+  #calendar {
+    overflow-x: auto;
+    padding: 0.5rem 0;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(53, 14px);
+    gap: 3px 3px;
+    user-select: none;
+  }
+  .calendar-weekday {
+    color: #594536;
+    font-size: 0.75rem;
+    margin-bottom: 0.3rem;
+    user-select: none;
+  }
+  .calendar-month-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #8B6F57;
+  }
+  .calendar-day {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    background: #FFFCF7;
+    border: 1px solid #E6D5C3;
+    box-shadow: inset 0 0 5px rgb(139 111 87 / 0.1);
+  }
+  .calendar-day.incomplete {
+    background: #FFFCF7;
+    border-color: #F6E4E7;
+    box-shadow: 0 0 6px 2px #F6E4E7;
+  }
+  .calendar-day.mobility {
+    background: #E6D5C3;
+    border-color: #A9B6A0;
+  }
+  .calendar-day.mobil+renf {
+    background: #E8C3CC;
+    border-color: #E8C3CC;
+  }
+  .calendar-day.rest {
+    background: #F6E4E7;
+    border-color: #F6E4E7;
+  }
+  .calendar-day.today {
+    border: 2px solid #A9B6A0;
+  }
+  .calendar-day:hover, .calendar-day:focus {
+    outline: 2px solid #8B6F57;
+    outline-offset: 2px;
+  }
+  /* Legend */
+  #legend {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #594536;
+    user-select: none;
+  }
+  #legend div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.3rem;
+  }
+  .legend-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 1px solid #E6D5C3;
+  }
+  .legend-mobility { background: #E6D5C3; border-color: #A9B6A0; }
+  .legend-mobilrenf { background: #E8C3CC; border-color: #E8C3CC; }
+  .legend-rest { background: #F6E4E7; border-color: #F6E4E7; }
+  .legend-incomplete {
+    background: #FFFCF7;
+    border-color: #F6E4E7;
+    box-shadow: 0 0 6px 2px #F6E4E7;
+  }
+
+  /* Modal */
+  #modalOverlay {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(245,239,230,0.92);
+    backdrop-filter: blur(4px);
+    z-index: 1500;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+  }
+  #modalOverlay.active {
+    display: flex;
+  }
+  #modalContent {
+    background: #FFFCF7;
+    padding: 2rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgb(139 111 87 / 0.35);
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    line-height: 1.4;
+    color: #594536;
+  }
+  #modalContent h3 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #8B6F57;
+  }
+  #modalCloseBtn {
+    background: #E8C3CC;
+    color: #594536;
+    font-weight: 600;
+    padding: 0.5em 1.2em;
+    border-radius: 20px;
+    margin-top: 1.2rem;
+    display: block;
+    margin-left: auto;
+    box-shadow: 0 2px 6px rgb(139 111 87 / 0.3);
+  }
+  #modalCloseBtn:hover, #modalCloseBtn:focus {
+    background: #F6E4E7;
+  }
+
+  /* Sections nav */
+  #sectionNav {
+    position: sticky;
+    top: 6.4rem;
+    background: #FFFCF7;
+    border-bottom: 1px solid #E6D5C3;
+    box-shadow: 0 1px 4px rgb(139 111 87 / 0.12);
+    z-index: 1200;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.8rem 0;
+  }
+  #sectionNav button {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #594536;
+    background: #FFFCF7;
+    border-radius: 12px;
+    padding: 0.45em 0.9em;
+    transition: background-color 0.3s ease;
+  }
+  #sectionNav button.active {
+    background: #E8C3CC;
+    color: #594536;
+    box-shadow: 1px 1px 5px rgb(139 111 87 / 0.5);
+  }
+  #sectionNav button:focus {
+    outline-offset: 3px;
+    outline: 2px solid #A9B6A0;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header h1 {
+      font-size: 1.7rem;
+    }
+    #navigationButtons {
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    #sectionNav {
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+    }
+  }
+
+  /* Smaller fonts for notes */
+  .note {
+    font-size: 0.85rem;
+    color: #8B6F57;
+    margin-top: 0.2rem;
+    font-style: italic;
+    user-select: none;
+  }
+  .small-text {
+    font-size: 0.85rem;
+    color: #8B6F57;
+  }
+  /* Buttons with icon */
+  button.icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.4em 0.9em;
+    user-select: none;
+  }
+  button.icon-btn svg {
+    fill: #594536;
+    width: 15px;
+    height: 15px;
+  }
+  button.icon-btn:focus {
+    outline-offset: 3px;
+    outline: 2px solid #A9B6A0;
+  }
+
+  /* Inputs for numeric */
+  input[type=number], input[type=text] {
+    border: 1px solid #E6D5C3;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 10px;
+    padding: 2px 8px;
+    max-width: 70px;
+    color: #594536;
+    background: #FFFCF7;
+  }
+  input[type=number]:focus, input[type=text]:focus {
+    border-color: #A9B6A0;
+    outline: none;
+  }
+
+  /* Special Sunday Rest page style background */
+  body.rest-day {
+    background: #F6E4E7;
+  }
+  section.rest-intro {
+    text-align: center;
+    padding: 2rem 1rem 3rem 1rem;
+    color: #594536;
+  }
+  svg.rest-illustration {
+    stroke: #8B6F57;
+    stroke-width: 1.6;
+    fill: none;
+    margin: 1rem auto 1rem;
+    max-width: 150px;
+    display: block;
+    opacity: 0.48;
+  }
+
+</style>
+</head>
+<body>
+<div id="app" role="main" aria-label="My Mobility Journal">
+
+<header role="banner" aria-label="Entête du site">
+  <h1 tabindex="0">My Mobility Journal</h1>
+  <p class="subtitle" tabindex="0">Chaque jour, un pas vers l’équilibre et la force douce</p>
+  <div class="top-info" aria-live="polite">
+    <div><strong>Date :</strong> <span id="dateDisplay" aria-atomic="true"></span></div>
+    <div><strong>Jour :</strong> <span id="weekdayDisplay"></span></div>
+    <div><strong>Séance :</strong> <span id="sessionType"></span></div>
+    <div><strong>Progression :</strong> <div class="progress-container" style="width: 100px; display: inline-block;"><div id="dayProgressBar" class="progress-bar" style="width: 0%;"></div></div></div>
+    <div><strong>Exercices terminés :</strong> <span id="exercisesCompletedCount">0</span>/<span id="exercisesTotalCount">0</span></div>
+    <div><strong>Jours validés cette semaine :</strong> <span id="validatedDaysCount">0</span>/7</div>
+  </div>
+  <div id="navigationButtons" role="navigation" aria-label="Navigation des jours">
+    <button id="btnPrevDay" aria-label="Jour précédent" title="Jour précédent">〈</button>
+    <button id="btnToday" aria-label="Aujourd’hui" title="Aujourd’hui">Aujourd’hui</button>
+    <button id="btnNextDay" aria-label="Jour suivant" title="Jour suivant">〉</button>
+  </div>
+</header>
+
+<nav id="sectionNav" role="navigation" aria-label="Navigation des sections principales">
+  <button id="navDashboard" class="active" aria-controls="mainContent" aria-selected="true" role="tab" tabindex="0">Tableau de bord</button>
+  <button id="navProgramme" aria-controls="mainContent" aria-selected="false" role="tab" tabindex="-1">Programme du jour</button>
+  <button id="navCalendar" aria-controls="mainContent" aria-selected="false" role="tab" tabindex="-1">Calendrier annuel</button>
+  <button id="navProgressions" aria-controls="mainContent" aria-selected="false" role="tab" tabindex="-1">Progressions</button>
+  <button id="navStats" aria-controls="mainContent" aria-selected="false" role="tab" tabindex="-1">Statistiques</button>
+</nav>
+
+<main id="mainContent" role="tabpanel" aria-live="polite" aria-atomic="true" tabindex="0">
+  <!-- Dynamic content here -->
+</main>
+
+<!-- Modal for Export/Import & Confirm -->
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+  <div id="modalContent">
+    <h3 id="modalTitle"></h3>
+    <pre id="modalText" style="white-space: pre-wrap;word-break: break-word; max-height: 50vh; overflow-y: auto; font-family: monospace; background: #F5EFE6; padding: 0.8rem; border-radius: 10px;"></pre>
+    <div id="modalInputContainer" style="display:none; margin-top:1rem;">
+      <textarea id="modalTextarea" rows="8" style="width: 100%; border-radius: 12px; border:1px solid #E6D5C3; background:#FFFCF7; color:#594536; font-family: monospace; font-size: 0.9rem;" aria-label="Zone de texte pour importer les données JSON"></textarea>
+    </div>
+    <div style="margin-top: 1.2rem; text-align: right;">
+      <button id="modalCloseBtn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+(() => {
+  // Strict mode
+  'use strict';
+
+  /* COLORS */
+  const COLORS = {
+    beige_creme: '#F5EFE6',
+    ivoire: '#FFFCF7',
+    beige_sable: '#E6D5C3',
+    marron_bois: '#8B6F57',
+    marron_fonce: '#594536',
+    rose_poudre: '#E8C3CC',
+    rose_pale: '#F6E4E7',
+    vert_sauge: '#A9B6A0'
+  };
+
+  /* DATA IDENTIFIERS & KEYS */
+  const STORAGE_KEY_DATA = 'MyMobilityJournalData';
+  const STORAGE_KEY_PROGRESSION_POMPES = 'MyMobilityProgressionPompes';
+  const STORAGE_KEY_PROGRESSION_PLANCHE = 'MyMobilityProgressionPlanche';
+  const STORAGE_KEY_PROGRESSION_HANDSTAND = 'MyMobilityProgressionHandstand';
+  const STORAGE_KEY_META = 'MyMobilityMeta';
+
+  /* PROGRAM SCHEDULES */
+  const WEEK_SCHEDULE = {
+    1: 'mobility+strength', // Monday
+    2: 'mobility',          // Tuesday
+    3: 'mobility+strength', // Wednesday
+    4: 'mobility',          // Thursday
+    5: 'mobility+strength', // Friday
+    6: 'mobility',          // Saturday
+    0: 'rest'               // Sunday (0 in JS getDay)
+  };
+  const WEEK_DAYS_FR = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+
+  /* Progression timelines and data definitions */
+
+  // Helper: format date YYYY-MM-DD localized for timezone
+  function formatDate(d) {
+    if (!(d instanceof Date)) return '';
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${y.toString().padStart(4,'0')}-${m.toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`;
+  }
+  // Helper: parse YYYY-MM-DD string
+  function parseDate(str) {
+    if (!str || typeof str !== 'string') return null;
+    const [y,m,d] = str.split('-').map(Number);
+    if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+    // Create date at local midnight
+    return new Date(y,m-1,d);
+  }
+  // Helper: get day number 0=sunday..6=saturday UTC is avoided; local only.
+  function getWeekDay(date) {
+    return date.getDay();
+  }
+  // Get French day name capitalized
+  function getWeekDayName(date) {
+    return WEEK_DAYS_FR[getWeekDay(date)].charAt(0).toUpperCase() + WEEK_DAYS_FR[getWeekDay(date)].slice(1);
+  }
+
+  // Return ISO week number and year according to ISO-8601
+  function getISOWeekNumber(d) {
+    const date = new Date(d.getTime());
+    date.setHours(0,0,0,0);
+    // Thursday in current week decides the year.
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    const week1 = new Date(date.getFullYear(),0,4);
+    return {
+      year: date.getFullYear(),
+      week: 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)
+    };
+  }
+
+  // Is leap year
+  function isLeapYear(year){
+    return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+  }
+
+  // Days in month
+  function daysInMonth(year, month) {
+    return [31,isLeapYear(year)?29:28,31,30,31,30,31,31,30,31,30,31][month];
+  }
+
+  /* DATA STORAGE & MANAGEMENT */
+
+  // Main data object shape:
+  // {
+  //   "YYYY-MM-DD":{
+  //     "exercises": { id: booleanChecked, ... },
+  //     "seriesCompleted": {...},
+  //     "restConfirmed": boolean,
+  //     "customSettings": {...},
+  //     "notes": string,
+  //   },
+  //   "YYYY-MM-DD-next":{
+  //     ...
+  //   },
+  //   ...
+  // }
+  // Separately:
+  // { pompes: {...}, planche: {...}, handstand: {...} }
+
+  let data = {};
+  let progressionPompes = {};
+  let progressionPlanche = {};
+  let progressionHandstand = {};
+  let meta = { programStartDate: null };
+
+  // Load all from localStorage
+  function loadAllData(){
+    try {
+      const d = localStorage.getItem(STORAGE_KEY_DATA);
+      data = d ? JSON.parse(d) : {};
+    } catch(e) { console.warn("Erreur lecture données", e); data = {}; }
+
+    try {
+      const p = localStorage.getItem(STORAGE_KEY_PROGRESSION_POMPES);
+      progressionPompes = p ? JSON.parse(p) : getDefaultPompesProgression();
+    } catch(e) { progressionPompes = getDefaultPompesProgression(); }
+
+    try {
+      const p = localStorage.getItem(STORAGE_KEY_PROGRESSION_PLANCHE);
+      progressionPlanche = p ? JSON.parse(p) : getDefaultPlancheProgression();
+    } catch(e) { progressionPlanche = getDefaultPlancheProgression(); }
+
+    try {
+      const p = localStorage.getItem(STORAGE_KEY_PROGRESSION_HANDSTAND);
+      progressionHandstand = p ? JSON.parse(p) : getDefaultHandstandProgression();
+    } catch(e) { progressionHandstand = getDefaultHandstandProgression(); }
+
+    try {
+      const m = localStorage.getItem(STORAGE_KEY_META);
+      meta = m ? JSON.parse(m) : {};
+    } catch(e) { meta = {}; }
+  }
+  // Save all to localStorage
+  function saveAllData(){
+    try { localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(data)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_PROGRESSION_POMPES, JSON.stringify(progressionPompes)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_PROGRESSION_PLANCHE, JSON.stringify(progressionPlanche)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_PROGRESSION_HANDSTAND, JSON.stringify(progressionHandstand)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_META, JSON.stringify(meta)); } catch {}
+  }
+
+  // Get data for single date string yyyy-mm-dd
+  function getDayData(dateStr){
+    return data[dateStr] || {exercises: {}, seriesCompleted: {}, restConfirmed: false, customSettings: {}, notes: ''};
+  }
+  // Save day data
+  function setDayData(dateStr, dayData){
+    data[dateStr] = dayData;
+    saveAllData();
+  }
+  function clearAllData(){
+    if(confirm("Voulez-vous vraiment réinitialiser TOUTES vos données ? Cette action est irréversible.")){
+      data = {};
+      progressionPompes = getDefaultPompesProgression();
+      progressionPlanche = getDefaultPlancheProgression();
+      progressionHandstand = getDefaultHandstandProgression();
+      meta = {};
+      saveAllData();
+      alert("Données réinitialisées.");
+      loadAndRenderDate(currentDate);
+      renderAllSections();
+    }
+  }
+
+  /* DATA EXPORT / IMPORT */
+
+  function exportData(){
+    const fullData = {
+      data,
+      progressionPompes,
+      progressionPlanche,
+      progressionHandstand,
+      meta
+    };
+    return JSON.stringify(fullData, null, 2);
+  }
+  // Import, with validation
+  function importData(jsonStr){
+    try {
+      const obj = JSON.parse(jsonStr);
+      if(typeof obj !== 'object') throw new Error("Format invalide");
+      // quick shape check
+      if(!obj.data || typeof obj.data !== 'object') throw new Error("Données invalides");
+      // Simple keys check for progression and meta
+      if(!obj.progressionPompes || !obj.progressionPlanche || !obj.progressionHandstand || !obj.meta){
+        throw new Error("Format incomplet");
+      }
+      // Overwrite current with imported
+      data = obj.data;
+      progressionPompes = obj.progressionPompes;
+      progressionPlanche = obj.progressionPlanche;
+      progressionHandstand = obj.progressionHandstand;
+      meta = obj.meta;
+      saveAllData();
+      alert("Données importées avec succès.");
+      loadAndRenderDate(currentDate);
+      renderAllSections();
+      closeModal();
+    } catch (e) {
+      alert("Erreur à l'importation : " + e.message);
+    }
+  }
+
+  /* DATE MANAGEMENT */
+
+  // Current date selected by user for session display
+  let currentDate = null;
+  // Today's date local midnight
+  function getTodayDate() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function incrementDate(date, days){
+    const d = new Date(date.getTime());
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  // Format date display in FR localized
+  function formatDateFR(date){
+    if(!(date instanceof Date)) return '';
+    const options = { year:'numeric', month:'long', day:'numeric' };
+    return date.toLocaleDateString('fr-FR', options);
+  }
+
+  // Display day name
+  function dayTypeForDate(date){
+    return WEEK_SCHEDULE[date.getDay()];
+  }
+
+  /* EXERCISE DEFINITIONS */
+
+  // Exercises for echauffement (warmup) same for all mobility days
+  const EXERCISES_WARMUP = [
+    {id:'cou-rotations', label:'Cou : rotations douces'},
+    {id:'epaules-cercles', label:'Épaules : cercles avant et arrière'},
+    {id:'bras-cercles', label:'Bras : grands cercles'},
+    {id:'dos-rotations', label:'Dos : rotations du buste et mouvement du chat-vache'},
+    {id:'hanches-rotations', label:'Hanches : rotations'},
+    {id:'genoux-squats', label:'Genoux : 8 à 10 squats lents'},
+    {id:'chevilles-mobilisations', label:'Chevilles : mobilisations'},
+    {id:'poignets-rotations', label:'Poignets : rotations et appuis doux au sol'}
+  ];
+
+  // For handstand preparation exercises
+  const HANDSTAND_EXERCISES = [
+    {
+      id:'hs-appuis-4pattes',
+      label:'Appuis à quatre pattes',
+      series: 2,
+      repsRange: [8,10],
+      restDefault: 45,
+      type: 'reps'
+    },
+    {
+      id:'hs-chien-tete-bas',
+      label:'Chien tête en bas',
+      series: 3,
+      repsRange: [10,20], // seconds hold
+      restDefault: 45,
+      type: 'time'
+    },
+    {
+      id:'hs-planche-bras-tendus',
+      label:'Planche bras tendus',
+      series: 2,
+      repsRange: [10,20], // seconds hold
+      restDefault: 45,
+      type: 'time'
+    },
+    {
+      id:'hs-gainage-dos',
+      label:'Gainage sur le dos',
+      series: 3,
+      repsRange: [10,20], // seconds hold
+      restDefault: 45,
+      type: 'time'
+    }
+  ];
+
+  // POMPES rep range progression
+  const POMPES_STEPS = [
+    { weeks: [1,4], series: 3, repsRange: [5,8] },
+    { weeks: [5,8], series: 3, repsRange: [8,12] },
+    { weeks: [9,12], series: 3, repsRange: [8,12], type:'inclined' },
+    { months: 4, series: 3, repsRange: [8,12], type:'inclined-lower' },
+    { months: 5, series: 3, repsRange: [8,12], type:'inclined-lower' },
+    { months: 6, series: 3, repsRange: [8,12], type:'normal' }
+  ];
+
+  // Planche progression durations (secs)
+  const PLANCHE_STEPS = [
+    { weeks: [1,2], seconds: 30 },
+    { weeks: [3,4], seconds: 35 },
+    { weeks: [5,6], seconds: 40 },
+    { weeks: [7,8], seconds: 45 },
+    { weeks: [9,10], seconds: 50 },
+    { weeks: [11,12], seconds: 55 },
+    { months: 4, secondsRange: [60,75] },
+    { months: 5, secondsRange: [75,90] },
+    { months: 6, secondsRange: [90,120] },
+    { months: 7, secondsRange: [120,180] }
+  ];
+
+  // Handstand steps descriptions
+  const HANDSTAND_STEPS = [
+    { id: 'step1', title:'Habituer les poignets et les mains aux appuis', desc:'Échauffement des poignets obligatoire. Travail progressif.' },
+    { id: 'step2', title:'Renforcer les épaules avec chien tête en bas et planche bras tendus', desc:'Renforcement doux et contrôle du placement.' },
+    { id: 'step3', title:'Renforcer le gainage avec la planche et position creuse sur le dos', desc:'Maintien du corps stable et respiration maitrisée.' },
+    { id: 'step4', title:'Apprendre placements et sorties avec encadrement adapté', desc:'Pas d’acrobaties brusques, sécurité prioritaire.' },
+    { id: 'step5', title:'Découvrir l’ATR contre un mur progressivement', desc:'Pas de montées brusques, travail sur équilibre.' },
+    { id: 'step6', title:'Travailler l’équilibre et l’alignement avant tenir longtemps', desc:'Contrôle du corps, respiration régulière.' }
+  ];
+
+  /* STATE */
+
+  // Current section (one of 'dashboard', 'programme', 'calendar', 'progressions', 'stats')
+  let currentSection = 'dashboard';
+
+  // Timers stored by unique IDs
+  // Timer structure: {intervalId, startTs, remainingMs, endTs, running, isCountdown, callbackOnEnd, updatedByInterval}
+  let timers = {};
+
+  /* UTILITIES */
+
+  // Format time mm:ss
+  function formatTimeMs(ms){
+    if(ms<0) ms=0;
+    const totalSeconds = Math.floor(ms/1000);
+    const m = Math.floor(totalSeconds/60);
+    const s = totalSeconds % 60;
+    return m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+  }
+
+  // Generate unique stable IDs for exercises within the session and day
+  // We'll stick with the predefined IDs in exercise arrays to keep stable keys for localStorage
+
+  // Generate aria-label for checkboxes (e.g. "Valider l'exercice Cou rotations douces")
+  function ariaLabelForCheckbox(labelText){
+    return `Valider l'exercice ${labelText}`;
+  }
+
+  // Clamp value between min and max inclusive
+  function clamp(num, min, max){
+    return Math.min(Math.max(num, min), max);
+  }
+
+  /* PROGRESSION HELPERS */
+
+  // Return how many weeks passed since start date
+  function weeksSinceStart() {
+    if(!meta.programStartDate) return 0;
+    const start = parseDate(meta.programStartDate);
+    if(!start) return 0;
+    const now = getTodayDate();
+    const diffDays = Math.floor((now.getTime() - start.getTime()) / (1000*60*60*24));
+    return Math.floor(diffDays/7) + 1;
+  }
+  // Return how many months passed since start
+  function monthsSinceStart() {
+    if(!meta.programStartDate) return 0;
+    const start = parseDate(meta.programStartDate);
+    if(!start) return 0;
+    const now = getTodayDate();
+    let months = (now.getFullYear() - start.getFullYear())*12 + (now.getMonth() - start.getMonth());
+    // If day of month now < start day, consider not full month
+    if(now.getDate() < start.getDate()) months--;
+    return months+1;
+  }
+
+  // Default progressions
+  function getDefaultPompesProgression(){
+    return {
+      currentStepIndex: 0,
+      startDate: meta.programStartDate || formatDate(getTodayDate()),
+      masteryConfirmed: false
+    };
+  }
+  function getDefaultPlancheProgression(){
+    return {
+      currentStepIndex: 0,
+      secondsChosen: null, // for variable ranges
+      startDate: meta.programStartDate || formatDate(getTodayDate()),
+      masteryConfirmed: false
+    };
+  }
+  function getDefaultHandstandProgression(){
+    return {
+      currentStepIndex: 0,
+      masteryConfirmed: false,
+      startDate: meta.programStartDate || formatDate(getTodayDate())
+    };
+  }
+
+  /* VALIDATION RULES FOR DAYS */
+
+  // Check if all exercises completed for a given day according to its type
+  // Data for the day is passed as dayData
+  function validateDay(dateStr){
+    const dayDate = parseDate(dateStr);
+    if(!dayDate) return 'none';
+    const dayType = dayTypeForDate(dayDate);
+    const dayData = getDayData(dateStr);
+    // For rest day
+    if(dayType === 'rest'){
+      return dayData.restConfirmed ? 'rest' : 'none';
+    }
+    // For mobility days (Tue, Thu, Sat)
+    if(dayType === 'mobility'){
+      // all warmup exercises must be checked
+      for(const ex of EXERCISES_WARMUP){
+        if(!dayData.exercises[ex.id]) return 'incomplete';
+      }
+      return 'mobility';
+    }
+    // For mobility+strength days (Mon, Wed, Fri)
+    if(dayType === 'mobility+strength'){
+      // Check warmup exercises:
+      for(const ex of EXERCISES_WARMUP){
+        if(!dayData.exercises[ex.id]) return 'incomplete';
+      }
+      // Must have pompes and gainage and handstand checked
+      // Check pompes: series 0,1,2 completed
+      if(!dayData.seriesCompleted['pompes-0'] || !dayData.seriesCompleted['pompes-1'] || !dayData.seriesCompleted['pompes-2']) return 'incomplete';
+      // Check gainage: series 0,1,2 completed
+      if(!dayData.seriesCompleted['gainage-0'] || !dayData.seriesCompleted['gainage-1'] || !dayData.seriesCompleted['gainage-2']) return 'incomplete';
+      // Handstand exercises: all series for each exercise completed
+      for(const ex of HANDSTAND_EXERCISES){
+        for(let s=0; s<ex.series; s++){
+          if(!dayData.seriesCompleted[`${ex.id}-${s}`]) return 'incomplete';
+        }
+      }
+      return 'mobil+renf';
+    }
+    return 'none';
+  }
+
+  // Colors map for calendar days validation states
+  const CALENDAR_DAY_STATUS_COLORS = {
+    'none':  null,
+    'incomplete': COLORS.rose_pale,
+    'mobility': COLORS.beige_sable,
+    'mobil+renf': COLORS.rose_poudre,
+    'rest': COLORS.rose_pale
+  };
+
+  /* RENDERING FUNCTIONS */
+
+  // Render header with date, day name, session type, progress and controls
+  function renderHeader(){
+    const dateDisplayEl = document.getElementById('dateDisplay');
+    const weekdayEl = document.getElementById('weekdayDisplay');
+    const sessionTypeEl = document.getElementById('sessionType');
+    const progressBarEl = document.getElementById('dayProgressBar');
+    const exercisesCompletedCountEl = document.getElementById('exercisesCompletedCount');
+    const exercisesTotalCountEl = document.getElementById('exercisesTotalCount');
+    const validatedDaysCountEl = document.getElementById('validatedDaysCount');
+
+    if(!dateDisplayEl || !weekdayEl || !sessionTypeEl || !progressBarEl || !exercisesCompletedCountEl || !exercisesTotalCountEl || !validatedDaysCountEl) return;
+
+    // Today's date
+    dateDisplayEl.textContent = formatDateFR(currentDate);
+    weekdayEl.textContent = getWeekDayName(currentDate);
+
+    // Session type
+    const sessionTypeRaw = dayTypeForDate(currentDate);
+    let sessionTypeText = '';
+    switch(sessionTypeRaw){
+      case 'mobility+strength': sessionTypeText = 'Mobilité + Renforcement'; break;
+      case 'mobility': sessionTypeText = 'Mobilité'; break;
+      case 'rest': sessionTypeText = 'Repos'; break;
+      default: sessionTypeText = 'Repos'; break;
+    }
+    sessionTypeEl.textContent = sessionTypeText;
+
+    // Count exercises checked for today
+    const dayData = getDayData(formatDate(currentDate));
+    let totalExercises = 0;
+    let completedExercises = 0;
+    // Count exercises according to day type
+    if(sessionTypeRaw === 'mobility+strength'){
+      totalExercises = EXERCISES_WARMUP.length;
+      completedExercises = EXERCISES_WARMUP.reduce((acc, ex)=> acc + (dayData.exercises && dayData.exercises[ex.id]?1:0),0);
+      // Pompes + gainage series count
+      const pompesCount = 3;
+      const gainageCount = 3;
+      totalExercises += pompesCount + gainageCount;
+      completedExercises += pompesCount + gainageCount;
+      for(let i=0; i<3; i++){
+        if(!dayData.seriesCompleted[`pompes-${i}`]) completedExercises--;
+        if(!dayData.seriesCompleted[`gainage-${i}`]) completedExercises--;
+      }
+      // Handstand total series count
+      let handstandSeries = 0;
+      let handstandCompleted =0;
+      for(const ex of HANDSTAND_EXERCISES){
+        handstandSeries += ex.series;
+        for(let s=0; s<ex.series; s++){
+          if(dayData.seriesCompleted[`${ex.id}-${s}`]) handstandCompleted++;
+        }
+      }
+      totalExercises += handstandSeries;
+      completedExercises += handstandCompleted;
+    } else if(sessionTypeRaw === 'mobility'){
+      totalExercises = EXERCISES_WARMUP.length;
+      completedExercises = EXERCISES_WARMUP.reduce((acc, ex)=> acc + (dayData.exercises && dayData.exercises[ex.id]?1:0),0);
+    } else if(sessionTypeRaw === 'rest'){
+      totalExercises = 1;
+      completedExercises = dayData.restConfirmed ? 1 : 0;
+    }
+
+    exercisesCompletedCountEl.textContent = completedExercises;
+    exercisesTotalCountEl.textContent = totalExercises;
+
+    // Progress bar: completed/total in %
+    const percent = totalExercises === 0 ? 0 : Math.floor((completedExercises / totalExercises)*100);
+    progressBarEl.style.width = percent + '%';
+    if(percent===100) progressBarEl.classList.add('complete');
+    else progressBarEl.classList.remove('complete');
+
+    // Count valid days this week
+    const validatedCount = countValidatedDaysCurrentWeek();
+    validatedDaysCountEl.textContent = validatedCount;
+  }
+
+  // Count validated days this week (Lundi-Dimanche)
+  function countValidatedDaysCurrentWeek() {
+    if(!currentDate) return 0;
+    let monday = incrementDate(currentDate, - (currentDate.getDay()===0 ? 6 : currentDate.getDay()-1));
+    let count = 0;
+    for(let i=0; i<7; i++){
+      const day = incrementDate(monday, i);
+      const dateStr = formatDate(day);
+      const val = validateDay(dateStr);
+      if(val === 'mobility' || val === 'mobil+renf' || val === 'rest') count++;
+    }
+    return count;
+  }
+
+  // Renders main content according to current section, dynamically injecting HTML
+  function renderAllSections(){
+    switch (currentSection){
+      case 'dashboard':
+        renderDashboard();
+        break;
+      case 'programme':
+        renderProgramme();
+        break;
+      case 'calendar':
+        renderCalendar();
+        break;
+      case 'progressions':
+        renderProgressions();
+        break;
+      case 'stats':
+        renderStatistics();
+        break;
+      default:
+        renderDashboard();
+    }
+    renderHeader();
+    // Update nav buttons aria
+    updateNavigationButtonsState();
+  }
+
+  // Update section navigation buttons aria-selected and tabindex (for keyboard)
+  function updateNavigationButtonsState(){
+    const buttons = document.querySelectorAll('#sectionNav button');
+    buttons.forEach(btn => {
+      if(btn.id === `nav${capitalize(currentSection)}`){
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        btn.tabIndex = 0;
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        btn.tabIndex = -1;
+      }
+    });
+  }
+
+  function capitalize(text){
+    if(!text) return '';
+    return text[0].toUpperCase() + text.slice(1);
+  }
+
+  /* 1. DASHBOARD */
+
+  function renderDashboard(){
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+    mainContent.innerHTML = '';
+
+    // Show a calm summary: this week validated, progressions status, quick links to next session, etc.
+    const container = document.createElement('section');
+    container.className = 'card decorated';
+
+    // Greetings and summary for today
+    const greeting = document.createElement('p');
+    greeting.textContent = `Bonjour ! Aujourd’hui c’est ${getWeekDayName(currentDate)}, le ${formatDateFR(currentDate)}.`;
+    container.appendChild(greeting);
+
+    // Weekly progress summary
+    const weekValidated = countValidatedDaysCurrentWeek();
+    const weekSummary = document.createElement('p');
+    weekSummary.innerHTML = `<strong>Jours validés cette semaine :</strong> ${weekValidated} / 7`;
+    container.appendChild(weekSummary);
+
+    // Progressions summary
+    const progSection = document.createElement('section');
+    progSection.style.marginTop = '1.2rem';
+
+    // Pompes
+    const pompesStatus = progressionPompes.currentStepIndex !== undefined ? progressionPompes.currentStepIndex : 0;
+    const pompesStep = POMPES_STEPS[clamp(pompesStatus,0,POMPES_STEPS.length-1)];
+    const pompesText = pompesStep ? 
+      (pompesStep.type ? `Pompes (${pompesStep.type})` : 'Pompes sur les genoux') : 'Pompes';
+
+    // Planche
+    let plancheStepIndex = progressionPlanche.currentStepIndex || 0;
+    let plancheStep = PLANCHE_STEPS[clamp(plancheStepIndex, 0, PLANCHE_STEPS.length-1)];
+    let plancheText = plancheStep.seconds ? `Planche : ${plancheStep.seconds} s` : 'Planche';
+
+    // Handstand
+    let hsStepIndex = progressionHandstand.currentStepIndex || 0;
+    let hsStep = HANDSTAND_STEPS[clamp(hsStepIndex, 0, HANDSTAND_STEPS.length-1)];
+    let hsText = hsStep ? hsStep.title : 'Handstand / ATR';
+
+    const progList = document.createElement('ul');
+    progList.style.marginTop = '0.8rem';
+    progList.style.lineHeight = '1.4';
+    progList.style.color = COLORS.marron_bois;
+    progList.style.fontWeight = '600';
+    progList.style.fontSize = '1rem';
+
+    // Pompes li
+    const liPompes = document.createElement('li');
+    liPompes.textContent = `Pompes : étape ${pompesStatus+1} - ${pompesText}`;
+    progList.appendChild(liPompes);
+    // Planche li
+    const liPlanche = document.createElement('li');
+    liPlanche.textContent = `Gainage : étape ${plancheStepIndex+1} - ${plancheText}`;
+    progList.appendChild(liPlanche);
+    // Handstand li
+    const liHS = document.createElement('li');
+    liHS.textContent = `Handstand : étape ${hsStepIndex+1} - ${hsText}`;
+    progList.appendChild(liHS);
+    progSection.appendChild(progList);
+    container.appendChild(progSection);
+
+    // Button to go to programme du jour
+    const goToProgrammeBtn = document.createElement('button');
+    goToProgrammeBtn.textContent = "Voir le programme du jour";
+    goToProgrammeBtn.style.marginTop = "1.5rem";
+    goToProgrammeBtn.className = 'chrono-btn';
+    goToProgrammeBtn.addEventListener('click', () => {
+      currentSection = 'programme';
+      renderAllSections();
+    });
+    container.appendChild(goToProgrammeBtn);
+
+    // Set main content
+    mainContent.appendChild(container);
+  }
+
+  /* 2. PROGRAMME DU JOUR */
+
+  // Generate the program for the selected day based on its type
+  function renderProgramme(){
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+
+    const dayDateStr = formatDate(currentDate);
+    const sessionTypeRaw = dayTypeForDate(currentDate);
+
+    // For Sunday rest day, special render
+    if(sessionTypeRaw === 'rest'){
+      renderRestDay(mainContent, dayDateStr);
+      return;
+    }
+
+    // Clear and start:
+    mainContent.innerHTML = '';
+    let container = document.createElement('section');
+    container.className = 'card decorated scroll-section';
+    container.style.maxHeight = '65vh';
+
+
+    // Section 1 : échauffement (warmup)
+    container.appendChild(createWarmupSection(dayDateStr));
+
+    // For mobility+strength days => add 3 other sections
+    if(sessionTypeRaw === 'mobility+strength'){
+      container.appendChild(createPompesSection(dayDateStr));
+      container.appendChild(createGainageSection(dayDateStr));
+      container.appendChild(createHandstandPreparationSection(dayDateStr));
+    }
+
+    // For mobility only days -> only warmup
+
+    // Add footer note
+    if(sessionTypeRaw === 'mobility'){
+      const note = document.createElement('p');
+      if(currentDate.getDay() === 4) // Thursday
+        note.textContent = "Mobilité douce et récupération. Mouvements confortables, sans forcer.";
+      else // Tuesday and Saturday
+        note.textContent = "Mobilité douce, contrôle et régularité.";
+      note.className = 'note';
+      container.appendChild(note);
+    }
+
+    // Submit button to validate day's session
+    const btnValidate = document.createElement('button');
+    btnValidate.textContent = 'Valider ma séance';
+    btnValidate.className = 'chrono-btn';
+    btnValidate.style.marginTop = '1.6rem';
+    btnValidate.addEventListener('click', () => {
+      const validation = validateDay(dayDateStr);
+      if(validation === 'none' || validation === 'incomplete'){
+        alert("Attention : la séance n'est pas entièrement complétée.");
+        // allow to validate partial (as requirement)
+      }
+      // Save confirmation / update calendar
+      setDayData(dayDateStr, getDayData(dayDateStr)); // ensure save
+      alert("Progression sauvegardée pour ce jour.");
+      renderHeader();
+      renderCalendar(); // update calendar to reflect
+    });
+    container.appendChild(btnValidate);
+
+    // Set content
+    mainContent.appendChild(container);
+  }
+
+  // Create warmup section with checkboxes and chronometer button
+  function createWarmupSection(dateStr){
+    const section = document.createElement('div');
+    section.setAttribute('aria-label', "Échauffement");
+    section.setAttribute('role', 'region');
+    section.tabIndex = -1;
+    const title = document.createElement('h2');
+    title.textContent = "Échauffement — 7 à 9 minutes";
+    section.appendChild(title);
+
+    // Create checkboxes for warmup exercises
+    const dayData = getDayData(dateStr);
+
+    const list = document.createElement('form');
+    list.setAttribute('aria-live', 'polite');
+
+    EXERCISES_WARMUP.forEach(ex => {
+      const label = document.createElement('label');
+      label.htmlFor = ex.id;
+      label.textContent = ex.label;
+      label.tabIndex = 0;
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = ex.id;
+      input.name = ex.id;
+      input.checked = !!dayData.exercises[ex.id];
+      input.setAttribute('aria-label', ariaLabelForCheckbox(ex.label));
+      input.addEventListener('change', (e) => {
+        updateCheckboxExercise(dateStr, ex.id, e.target.checked);
+      });
+
+      label.prepend(input);
+      list.appendChild(label);
+    });
+    section.appendChild(list);
+
+    // Button to start chronometer (7 to 9 min)
+    const chronoId = 'warmup-chrono';
+    const chronoControlDiv = document.createElement('div');
+    chronoControlDiv.style.marginTop = '1rem';
+
+    // Show timer display
+    const timerDisplay = document.createElement('span');
+    timerDisplay.id = 'warmupTimerDisplay';
+    timerDisplay.className = 'timer-display';
+    timerDisplay.setAttribute('aria-live', 'polite');
+    timerDisplay.textContent = formatTimeMs(7*60*1000);
+
+    // Start button
+    const btnStart = document.createElement('button');
+    btnStart.textContent = 'Démarrer l’échauffement (7 min)';
+    btnStart.className = 'chrono-btn';
+    btnStart.addEventListener('click', () => {
+      if(timers[chronoId] && timers[chronoId].running){
+        // pause or resume handled by timer controls below
+        return;
+      }
+      startTimer(chronoId, 7*60*1000, (remaining, ended) => {
+        timerDisplay.textContent = formatTimeMs(remaining);
+        if(ended){
+          alert("L'échauffement est terminé.");
+          stopTimer(chronoId);
+        }
+      });
+    });
+
+    // Pause button
+    const btnPause = document.createElement('button');
+    btnPause.textContent = 'Pause';
+    btnPause.className = 'chrono-btn';
+    btnPause.disabled = true;
+    btnPause.addEventListener('click', () => {
+      pauseTimer(chronoId);
+    });
+    // Resume button
+    const btnResume = document.createElement('button');
+    btnResume.textContent = 'Reprendre';
+    btnResume.className = 'chrono-btn';
+    btnResume.style.marginLeft = '0.6rem';
+    btnResume.disabled = true;
+    btnResume.addEventListener('click', () => {
+      resumeTimer(chronoId);
+    });
+    // Reset button
+    const btnReset = document.createElement('button');
+    btnReset.textContent = 'Réinitialiser';
+    btnReset.className = 'chrono-btn';
+    btnReset.style.marginLeft = '0.6rem';
+    btnReset.disabled = true;
+    btnReset.addEventListener('click', () => {
+      stopTimer(chronoId);
+      timerDisplay.textContent = formatTimeMs(7*60*1000);
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+      btnResume.disabled = true;
+      btnReset.disabled = true;
+    });
+
+    // Wrapper to enable/disable buttons dynamically every tick
+    function updateButtonsControls(enabledStatus){
+      btnStart.disabled = !enabledStatus.start;
+      btnPause.disabled = !enabledStatus.pause;
+      btnResume.disabled = !enabledStatus.resume;
+      btnReset.disabled = !enabledStatus.reset;
+    }
+
+    // We'll listen to timer changes and update buttons accordingly
+    timers[chronoId] = null; // init
+
+    // We'll override startTimer to update buttons
+    // Increment every second by timer events
+    // Attach side effect on pause / resume / stop to update buttons
+
+    // Attach event listeners that will ensure correct buttons states
+    // We'll do this in startTimer and others
+
+    chronoControlDiv.appendChild(btnStart);
+    chronoControlDiv.appendChild(btnPause);
+    chronoControlDiv.appendChild(btnResume);
+    chronoControlDiv.appendChild(btnReset);
+    chronoControlDiv.appendChild(document.createTextNode(' '));
+    chronoControlDiv.appendChild(timerDisplay);
+    section.appendChild(chronoControlDiv);
+
+    /* Manage buttons state update with timer events */
+    // To simplify, keep track with these functions
+
+    function onTimerStart(){
+      updateButtonsControls({start:false,pause:true,resume:false,reset:true});
+    }
+    function onTimerPause(){
+      updateButtonsControls({start:false,pause:false,resume:true,reset:true});
+    }
+    function onTimerResume(){
+      updateButtonsControls({start:false,pause:true,resume:false,reset:true});
+    }
+    function onTimerStop(){
+      updateButtonsControls({start:true,pause:false,resume:false,reset:false});
+    }
+
+    // Override timer function hooks (patch startTimer, pauseTimer, resumeTimer, stopTimer)
+    // For this special timer only
+
+    function wrappedStartTimer(id, duration, cb){
+      startTimer(id, duration, cb);
+      if(id===chronoId) onTimerStart();
+    }
+    function wrappedPauseTimer(id){
+      pauseTimer(id);
+      if(id===chronoId) onTimerPause();
+    }
+    function wrappedResumeTimer(id){
+      resumeTimer(id);
+      if(id===chronoId) onTimerResume();
+    }
+    function wrappedStopTimer(id){
+      stopTimer(id);
+      if(id===chronoId) onTimerStop();
+    }
+    // Replace with wrappers
+    window.startTimer = wrappedStartTimer;
+    window.pauseTimer = wrappedPauseTimer;
+    window.resumeTimer = wrappedResumeTimer;
+    window.stopTimer = wrappedStopTimer;
+
+    return section;
+  }
+
+  // Helper: update checkbox state in data and save
+  function updateCheckboxExercise(dateStr, exerciseId, checked){
+    const dayData = getDayData(dateStr);
+    if(!dayData.exercises) dayData.exercises = {};
+    dayData.exercises[exerciseId] = checked;
+    setDayData(dateStr, dayData);
+    renderHeader();
+  }
+
+  /* Pompes sur genoux section (Monday, Wednesday, Friday) */
+
+  // Get dynamic reps range for pompes depending on progression step and mastery
+  function getPompesRepsRange(){
+    const weeks = weeksSinceStart();
+    // Get best step index matching weeks
+    for(let i = POMPES_STEPS.length - 1; i>=0; i--){
+      let step = POMPES_STEPS[i];
+      if(step.weeks && weeks >= step.weeks[0] && weeks <= step.weeks[1]) return step.repsRange;
+      if(step.months && monthsSinceStart() >= step.months) return step.repsRange;
+    }
+    return [5,8]; // default fallback
+  }
+
+  // Create Pompes section with 3 series + checkboxes + rest timers
+  function createPompesSection(dateStr){
+    const section = document.createElement('div');
+    section.setAttribute('aria-label', "Pompes sur les genoux");
+    section.setAttribute('role', 'region');
+    section.tabIndex = -1;
+
+    const title = document.createElement('h2');
+    title.textContent = "Pompes sur les genoux";
+    section.appendChild(title);
+
+    // Instruction
+    const instr = document.createElement('p');
+    instr.className = 'note';
+    instr.textContent = 'Descente contrôlée, corps aligné.';
+    section.appendChild(instr);
+
+    // Pompes reps range (adjusted from progression)
+    const repsRange = getPompesRepsRange();
+    const dayData = getDayData(dateStr);
+
+    const list = document.createElement('div');
+    list.style.display = 'flex';
+    list.style.flexDirection = 'column';
+    list.style.gap = '0.8rem';
+
+    // For each series (0,1,2)
+    for(let i=0; i<3; i++){
+      const seriesDiv = document.createElement('div');
+      seriesDiv.className = 'flex-row space-between';
+      seriesDiv.style.alignItems = 'center';
+
+      // Checkbox
+      const label = document.createElement('label');
+      label.htmlFor = `pompes-checkbox-${i}`;
+      label.textContent = `Série ${i+1}: ${repsRange[0]} à ${repsRange[1]} répétitions`;
+      label.style.flex = '1';
+      label.setAttribute('aria-label', ariaLabelForCheckbox(`Pompes série ${i+1}`));
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `pompes-checkbox-${i}`;
+      checkbox.checked = !!dayData.seriesCompleted[`pompes-${i}`];
+      checkbox.addEventListener('change', e => {
+        const d = getDayData(dateStr);
+        if(!d.seriesCompleted) d.seriesCompleted = {};
+        d.seriesCompleted[`pompes-${i}`] = e.target.checked;
+        setDayData(dateStr, d);
+        renderHeader();
+      });
+      label.prepend(checkbox);
+
+      // Rest chronometer buttons
+      const restSecDefault = 60;
+      const restSecMax = 90;
+      const timerId = `pompes-rest-${i}`;
+      
+      const restContainer = document.createElement('div');
+      restContainer.style.display = 'flex';
+      restContainer.style.alignItems = 'center';
+      restContainer.style.gap = '0.4rem';
+
+      const timerDisplay = document.createElement('span');
+      timerDisplay.id = `${timerId}-display`;
+      timerDisplay.className = 'timer-display';
+      timerDisplay.textContent = formatTimeMs(restSecDefault*1000);
+
+      // Duration input to customize rest seconds
+      const restInput = document.createElement('input');
+      restInput.type = 'number';
+      restInput.min = restSecDefault;
+      restInput.max = restSecMax;
+      restInput.value = restSecDefault;
+      restInput.title = 'Durée du repos en secondes (modifiable)';
+      restInput.setAttribute('aria-label', `Durée du repos pour la série ${i+1} des pompes`);
+      restInput.style.maxWidth = '55px';
+      restInput.addEventListener('change', () => {
+        let val = parseInt(restInput.value);
+        if(isNaN(val) || val < restSecDefault) val = restSecDefault;
+        if(val > restSecMax) val = restSecMax;
+        restInput.value = val;
+      });
+
+      // Buttons start, pause, reset
+      const btnStart = document.createElement('button');
+      btnStart.textContent = 'Repos start';
+      btnStart.className = 'chrono-btn icon-btn';
+      btnStart.addEventListener('click', () => {
+        startTimer(timerId, restInput.value*1000, (rem, ended) => {
+          timerDisplay.textContent = formatTimeMs(rem);
+          if(ended){
+            alert('Repos terminé pour la série ' + (i+1) + ' des pompes.');
+            stopTimer(timerId);
+          }
+        });
+        btnStart.disabled = true; btnPause.disabled = false; btnResume.disabled = true; btnReset.disabled = false;
+      });
+
+      const btnPause = document.createElement('button');
+      btnPause.textContent = 'Pause';
+      btnPause.className = 'chrono-btn icon-btn';
+      btnPause.disabled = true;
+      btnPause.addEventListener('click', () => {
+        pauseTimer(timerId);
+        btnPause.disabled = true; btnResume.disabled = false;
+      });
+
+      const btnResume = document.createElement('button');
+      btnResume.textContent = 'Reprendre';
+      btnResume.className = 'chrono-btn icon-btn';
+      btnResume.disabled = true;
+      btnResume.addEventListener('click', () => {
+        resumeTimer(timerId);
+        btnPause.disabled = false; btnResume.disabled = true;
+      });
+
+      const btnReset = document.createElement('button');
+      btnReset.textContent = 'Réinit';
+      btnReset.className = 'chrono-btn icon-btn';
+      btnReset.disabled = true;
+      btnReset.addEventListener('click', () => {
+        stopTimer(timerId);
+        timerDisplay.textContent = formatTimeMs(restInput.value*1000);
+        btnStart.disabled = false; btnPause.disabled = true; btnResume.disabled = true; btnReset.disabled = true;
+      });
+
+      restContainer.appendChild(restInput);
+      restContainer.appendChild(timerDisplay);
+      restContainer.appendChild(btnStart);
+      restContainer.appendChild(btnPause);
+      restContainer.appendChild(btnResume);
+      restContainer.appendChild(btnReset);
+
+      seriesDiv.appendChild(label);
+      seriesDiv.appendChild(restContainer);
+      list.appendChild(seriesDiv);
+    }
+
+    section.appendChild(list);
+    return section;
+  }
+
+  /* Gainage section with 3 series and timers for hold and rest */
+
+  function createGainageSection(dateStr){
+    const section = document.createElement('div');
+    section.setAttribute('aria-label', "Gainage - planche");
+    section.setAttribute('role', 'region');
+    section.tabIndex = -1;
+
+    const title = document.createElement('h2');
+    title.textContent = "Gainage — Planche";
+    section.appendChild(title);
+
+    // Consignes
+    const consignes = document.createElement('p');
+    consignes.className = 'note';
+    consignes.textContent = "Abdominaux contractés, dos aligné, respiration régulière.";
+    section.appendChild(consignes);
+
+    const repsCount = 3;
+    const dayData = getDayData(dateStr);
+
+    // Determine hold time from progression, default 30 sec
+    let stepIndex = progressionPlanche.currentStepIndex || 0;
+    let step = PLANCHE_STEPS[clamp(stepIndex, 0, PLANCHE_STEPS.length-1)];
+    let holdSeconds = step.seconds || (step.secondsRange ? step.secondsRange[0] : 30);
+    if(step.secondsRange && progressionPlanche.secondsChosen){
+      holdSeconds = clamp(progressionPlanche.secondsChosen, step.secondsRange[0], step.secondsRange[1]);
+    }
+
+    const list = document.createElement('div');
+    list.style.display = 'flex';
+    list.style.flexDirection = 'column';
+    list.style.gap = '1rem';
+
+    for(let i=0; i<repsCount; i++){
+      const seriesDiv = document.createElement('div');
+      seriesDiv.className = 'flex-row space-between';
+      seriesDiv.style.flexWrap = 'wrap';
+      seriesDiv.style.alignItems = 'center';
+      seriesDiv.style.gap = '0.5rem';
+
+      const label = document.createElement('label');
+      label.htmlFor = `gainage-checkbox-${i}`;
+      label.textContent = `Série ${i+1} - Maintien ${holdSeconds} s`;
+      label.style.flex = '1';
+      label.setAttribute('aria-label', ariaLabelForCheckbox(`Gainage série ${i+1}`));
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `gainage-checkbox-${i}`;
+      checkbox.checked = !!dayData.seriesCompleted[`gainage-${i}`];
+      checkbox.addEventListener('change', e => {
+        const d = getDayData(dateStr);
+        if(!d.seriesCompleted) d.seriesCompleted = {};
+        d.seriesCompleted[`gainage-${i}`] = e.target.checked;
+        setDayData(dateStr, d);
+        renderHeader();
+      });
+      label.prepend(checkbox);
+
+      // Timer for hold
+      const holdTimerId = `gainage-hold-${i}`;
+      const holdDisplay = document.createElement('span');
+      holdDisplay.id = `${holdTimerId}-display`;
+      holdDisplay.className = 'timer-display';
+      holdDisplay.textContent = formatTimeMs(holdSeconds*1000);
+
+      // Timer for rest
+      const restTimerId = `gainage-rest-${i}`;
+      const restDisplay = document.createElement('span');
+      restDisplay.id = `${restTimerId}-display`;
+      restDisplay.className = 'timer-display';
+      restDisplay.textContent = formatTimeMs(45*1000);
+
+      // Buttons for hold timer
+      const btnHoldStart = document.createElement('button');
+      btnHoldStart.textContent = 'Démarrer maintien';
+      btnHoldStart.className = 'chrono-btn icon-btn';
+      btnHoldStart.addEventListener('click', () => {
+        startTimer(holdTimerId, holdSeconds*1000, (rem, ended) => {
+          holdDisplay.textContent = formatTimeMs(rem);
+          if(ended){
+            alert('Maintien terminé pour la série ' + (i+1) + ' du gainage.');
+            stopTimer(holdTimerId);
+          }
+        });
+        btnHoldStart.disabled = true; btnHoldPause.disabled = false; btnHoldResume.disabled = true; btnHoldReset.disabled = false;
+      });
+
+      const btnHoldPause = document.createElement('button');
+      btnHoldPause.textContent = 'Pause';
+      btnHoldPause.className = 'chrono-btn icon-btn';
+      btnHoldPause.disabled = true;
+      btnHoldPause.addEventListener('click', () => {
+        pauseTimer(holdTimerId);
+        btnHoldPause.disabled = true; btnHoldResume.disabled = false;
+      });
+
+      const btnHoldResume = document.createElement('button');
+      btnHoldResume.textContent = 'Reprendre';
+      btnHoldResume.className = 'chrono-btn icon-btn';
+      btnHoldResume.disabled = true;
+      btnHoldResume.addEventListener('click', () => {
+        resumeTimer(holdTimerId);
+        btnHoldPause.disabled = false; btnHoldResume.disabled = true;
+      });
+
+      const btnHoldReset = document.createElement('button');
+      btnHoldReset.textContent = 'Réinit';
+      btnHoldReset.className = 'chrono-btn icon-btn';
+      btnHoldReset.disabled = true;
+      btnHoldReset.addEventListener('click', () => {
+        stopTimer(holdTimerId);
+        holdDisplay.textContent = formatTimeMs(holdSeconds*1000);
+        btnHoldStart.disabled = false; btnHoldPause.disabled = true; btnHoldResume.disabled = true; btnHoldReset.disabled = true;
+      });
+
+      // Buttons for rest timer
+      const btnRestStart = document.createElement('button');
+      btnRestStart.textContent = 'Démarrer repos';
+      btnRestStart.className = 'chrono-btn icon-btn';
+      btnRestStart.addEventListener('click', () => {
+        startTimer(restTimerId, 45*1000, (rem, ended) => {
+          restDisplay.textContent = formatTimeMs(rem);
+          if(ended){
+            alert('Repos terminé pour la série ' + (i+1) + ' du gainage.');
+            stopTimer(restTimerId);
+          }
+        });
+        btnRestStart.disabled = true; btnRestPause.disabled = false; btnRestResume.disabled = true; btnRestReset.disabled = false;
+      });
+
+      const btnRestPause = document.createElement('button');
+      btnRestPause.textContent = 'Pause';
+      btnRestPause.className = 'chrono-btn icon-btn';
+      btnRestPause.disabled = true;
+      btnRestPause.addEventListener('click', () => {
+        pauseTimer(restTimerId);
+        btnRestPause.disabled = true; btnRestResume.disabled = false;
+      });
+
+      const btnRestResume = document.createElement('button');
+      btnRestResume.textContent = 'Reprendre';
+      btnRestResume.className = 'chrono-btn icon-btn';
+      btnRestResume.disabled = true;
+      btnRestResume.addEventListener('click', () => {
+        resumeTimer(restTimerId);
+        btnRestPause.disabled = false; btnRestResume.disabled = true;
+      });
+
+      const btnRestReset = document.createElement('button');
+      btnRestReset.textContent = 'Réinit';
+      btnRestReset.className = 'chrono-btn icon-btn';
+      btnRestReset.disabled = true;
+      btnRestReset.addEventListener('click', () => {
+        stopTimer(restTimerId);
+        restDisplay.textContent = formatTimeMs(45*1000);
+        btnRestStart.disabled = false; btnRestPause.disabled = true; btnRestResume.disabled = true; btnRestReset.disabled = true;
+      });
+
+      // Compose control panels
+      const holdButtonsDiv = document.createElement('div');
+      holdButtonsDiv.style.display = 'flex';
+      holdButtonsDiv.style.gap = '0.3rem';
+      holdButtonsDiv.append(btnHoldStart, btnHoldPause, btnHoldResume, btnHoldReset);
+
+      const restButtonsDiv = document.createElement('div');
+      restButtonsDiv.style.display = 'flex';
+      restButtonsDiv.style.gap = '0.3rem';
+      restButtonsDiv.append(btnRestStart, btnRestPause, btnRestResume, btnRestReset);
+
+      // Compose timer displays
+      const holdTimerDiv = document.createElement('div');
+      holdTimerDiv.appendChild(document.createTextNode('Maintien : '));
+      holdTimerDiv.appendChild(holdDisplay);
+      holdTimerDiv.appendChild(holdButtonsDiv);
+
+      const restTimerDiv = document.createElement('div');
+      restTimerDiv.appendChild(document.createTextNode('Repos : '));
+      restTimerDiv.appendChild(restDisplay);
+      restTimerDiv.appendChild(restButtonsDiv);
+
+      // Add all to seriesDiv
+      const timersContainer = document.createElement('div');
+      timersContainer.style.display = 'flex';
+      timersContainer.style.flexDirection = 'column';
+      timersContainer.style.gap = '0.4rem';
+      timersContainer.style.flex = '1';
+      timersContainer.appendChild(holdTimerDiv);
+      timersContainer.appendChild(restTimerDiv);
+
+      seriesDiv.appendChild(label);
+      seriesDiv.appendChild(timersContainer);
+
+      list.appendChild(seriesDiv);
+    }
+
+    section.appendChild(list);
+
+    // If current step allows selecting hold time for months 4 and 5
+    let stepIndex = progressionPlanche.currentStepIndex || 0;
+    let step = PLANCHE_STEPS[clamp(stepIndex, 0, PLANCHE_STEPS.length-1)];
+    if(step.secondsRange && typeof progressionPlanche.secondsChosen !== 'number'){
+      progressionPlanche.secondsChosen = step.secondsRange[0];
+      saveAllData();
+    }
+    if(step.secondsRange){
+      // Show selector to choose hold time in range
+      const selectDiv = document.createElement('div');
+      selectDiv.style.marginTop = '1rem';
+      selectDiv.innerHTML = `<label for="plancheDurationSelect" style="font-weight:600;">Durée cible du maintien :</label> `;
+      const selectInput = document.createElement('input');
+      selectInput.type = 'number';
+      selectInput.id = 'plancheDurationSelect';
+      selectInput.min = step.secondsRange[0];
+      selectInput.max = step.secondsRange[1];
+      selectInput.value = progressionPlanche.secondsChosen;
+      selectInput.style.maxWidth = '60px';
+      selectInput.addEventListener('change', () => {
+        let val = parseInt(selectInput.value);
+        if(isNaN(val)) val = step.secondsRange[0];
+        val = clamp(val, step.secondsRange[0], step.secondsRange[1]);
+        progressionPlanche.secondsChosen = val;
+        saveAllData();
+        renderProgramme();
+      });
+      selectDiv.appendChild(selectInput);
+      selectDiv.appendChild(document.createTextNode(` secondes (entre ${step.secondsRange[0]} et ${step.secondsRange[1]})`));
+      section.appendChild(selectDiv);
+    }
+
+    // Button to confirm mastery and pass to next stage
+    const masteryBtn = document.createElement('button');
+    masteryBtn.textContent = 'Étape maîtrisée, passer à la suivante';
+    masteryBtn.className = 'chrono-btn';
+    masteryBtn.style.marginTop = '1rem';
+    masteryBtn.addEventListener('click', () => {
+      const ci = progressionPlanche.currentStepIndex || 0;
+      if(ci < PLANCHE_STEPS.length - 1){
+        progressionPlanche.currentStepIndex = ci + 1;
+        progressionPlanche.masteryConfirmed = true;
+        // Reset chosen seconds for safety
+        progressionPlanche.secondsChosen = null;
+        saveAllData();
+        alert(`Passage à l'étape ${ci+2} du gainage.`);
+        renderAllSections();
+      } else {
+        alert("Vous êtes déjà à la dernière étape du gainage.");
+      }
+    });
+    section.appendChild(masteryBtn);
+
+    return section;
+  }
+
+  /* Handstand Preparation Section */
+
+  function createHandstandPreparationSection(dateStr){
+    const section = document.createElement('div');
+    section.setAttribute('aria-label', "Préparation Handstand");
+    section.setAttribute('role', 'region');
+    section.tabIndex = -1;
+
+    const title = document.createElement('h2');
+    title.textContent = 'Préparation Handstand';
+    section.appendChild(title);
+
+    const dayData = getDayData(dateStr);
+
+    // For each handstand exercise create card with series checkboxes and timers if hold
+    HANDSTAND_EXERCISES.forEach(ex => {
+      const card = document.createElement('div');
+      card.style.border = `1px solid ${COLORS.beige_sable}`;
+      card.style.borderRadius = '14px';
+      card.style.padding = '0.8rem 1.2rem';
+      card.style.marginTop = '1rem';
+      card.style.background = COLORS.ivoire;
+
+      const cardTitle = document.createElement('h3');
+      cardTitle.textContent = ex.label;
+      card.appendChild(cardTitle);
+
+      // Series list
+      const seriesList = document.createElement('div');
+      seriesList.style.display = 'flex';
+      seriesList.style.flexDirection = 'column';
+      seriesList.style.gap = '0.6rem';
+
+      for(let s=0; s < ex.series; s++){
+        const seriesDiv = document.createElement('div');
+        seriesDiv.className = 'flex-row space-between';
+        seriesDiv.style.alignItems = 'center';
+
+        // Checkbox
+        const label = document.createElement('label');
+        const chkId = `${ex.id}-series-${s}`;
+        label.htmlFor = chkId;
+        label.textContent = `Série ${s+1}: `;
+        // Reps or secs info
+        if(ex.type==='reps'){
+          label.textContent += `${ex.repsRange[0]} à ${ex.repsRange[1]} repetitions`;
+        } else if(ex.type==='time'){
+          label.textContent += `${ex.repsRange[0]} à ${ex.repsRange[1]} secondes`;
+        }
+        label.style.flex = '1';
+        label.setAttribute('aria-label', ariaLabelForCheckbox(`${ex.label} série ${s+1}`));
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = chkId;
+        checkbox.checked = !!dayData.seriesCompleted[`${ex.id}-${s}`];
+        checkbox.addEventListener('change', e => {
+          const d = getDayData(dateStr);
+          if(!d.seriesCompleted) d.seriesCompleted = {};
+          d.seriesCompleted[`${ex.id}-${s}`] = e.target.checked;
+          setDayData(dateStr, d);
+          renderHeader();
+        });
+        label.prepend(checkbox);
+
+        seriesDiv.appendChild(label);
+
+        // For time type, add chronometer and rest control
+        if(ex.type === 'time'){
+          const holdTimerId = `${ex.id}-hold-${s}`;
+          const restTimerId = `${ex.id}-rest-${s}`;
+          const holdDisplay = document.createElement('span');
+          holdDisplay.id = `${holdTimerId}-display`;
+          holdDisplay.className = 'timer-display';
+          // Default hold duration = repsRange[0] secs
+          holdDisplay.textContent = formatTimeMs(ex.repsRange[0]*1000);
+
+          const restDisplay = document.createElement('span');
+          restDisplay.id = `${restTimerId}-display`;
+          restDisplay.className = 'timer-display';
+          restDisplay.textContent = formatTimeMs(45*1000);
+
+          // Buttons Hold
+          const btnHoldStart = document.createElement('button');
+          btnHoldStart.textContent = 'Démarrer maintien';
+          btnHoldStart.className = 'chrono-btn icon-btn';
+          btnHoldStart.addEventListener('click', () => {
+            startTimer(holdTimerId, ex.repsRange[0]*1000, (rem, ended) => {
+              holdDisplay.textContent = formatTimeMs(rem);
+              if(ended){
+                alert(`Maintien terminé série ${s+1} de ${ex.label}`);
+                stopTimer(holdTimerId);
+              }
+            });
+            btnHoldStart.disabled = true; btnHoldPause.disabled = false; btnHoldResume.disabled = true; btnHoldReset.disabled = false;
+          });
+
+          const btnHoldPause = document.createElement('button');
+          btnHoldPause.textContent = 'Pause';
+          btnHoldPause.className = 'chrono-btn icon-btn';
+          btnHoldPause.disabled = true;
+          btnHoldPause.addEventListener('click', () => {
+            pauseTimer(holdTimerId);
+            btnHoldPause.disabled = true; btnHoldResume.disabled = false;
+          });
+
+          const btnHoldResume = document.createElement('button');
+          btnHoldResume.textContent = 'Reprendre';
+          btnHoldResume.className = 'chrono-btn icon-btn';
+          btnHoldResume.disabled = true;
+          btnHoldResume.addEventListener('click', () => {
+            resumeTimer(holdTimerId);
+            btnHoldPause.disabled = false; btnHoldResume.disabled = true;
+          });
+
+          const btnHoldReset = document.createElement('button');
+          btnHoldReset.textContent = 'Réinit';
+          btnHoldReset.className = 'chrono-btn icon-btn';
+          btnHoldReset.disabled = true;
+          btnHoldReset.addEventListener('click', () => {
+            stopTimer(holdTimerId);
+            holdDisplay.textContent = formatTimeMs(ex.repsRange[0]*1000);
+            btnHoldStart.disabled = false; btnHoldPause.disabled = true; btnHoldResume.disabled = true; btnHoldReset.disabled = true;
+          });
+
+          // Buttons Rest
+          const btnRestStart = document.createElement('button');
+          btnRestStart.textContent = 'Démarrer repos';
+          btnRestStart.className = 'chrono-btn icon-btn';
+          btnRestStart.addEventListener('click', () => {
+            startTimer(restTimerId, 45*1000, (rem, ended) => {
+              restDisplay.textContent = formatTimeMs(rem);
+              if(ended){
+                alert(`Repos terminé série ${s+1} de ${ex.label}`);
+                stopTimer(restTimerId);
+              }
+            });
+            btnRestStart.disabled = true; btnRestPause.disabled = false; btnRestResume.disabled = true; btnRestReset.disabled = false;
+          });
+
+          const btnRestPause = document.createElement('button');
+          btnRestPause.textContent = 'Pause';
+          btnRestPause.className = 'chrono-btn icon-btn';
+          btnRestPause.disabled = true;
+          btnRestPause.addEventListener('click', () => {
+            pauseTimer(restTimerId);
+            btnRestPause.disabled = true; btnRestResume.disabled = false;
+          });
+
+          const btnRestResume = document.createElement('button');
+          btnRestResume.textContent = 'Reprendre';
+          btnRestResume.className = 'chrono-btn icon-btn';
+          btnRestResume.disabled = true;
+          btnRestResume.addEventListener('click', () => {
+            resumeTimer(restTimerId);
+            btnRestPause.disabled = false; btnRestResume.disabled = true;
+          });
+
+          const btnRestReset = document.createElement('button');
+          btnRestReset.textContent = 'Réinit';
+          btnRestReset.className = 'chrono-btn icon-btn';
+          btnRestReset.disabled = true;
+          btnRestReset.addEventListener('click', () => {
+            stopTimer(restTimerId);
+            restDisplay.textContent = formatTimeMs(45*1000);
+            btnRestStart.disabled = false; btnRestPause.disabled = true; btnRestResume.disabled = true; btnRestReset.disabled = true;
+          });
+
+          // Compose hold buttons div
+          const holdBtnsDiv = document.createElement('div');
+          holdBtnsDiv.style.display = 'flex';
+          holdBtnsDiv.style.gap = '0.3rem';
+          holdBtnsDiv.append(btnHoldStart, btnHoldPause, btnHoldResume, btnHoldReset);
+
+          // Compose rest buttons div
+          const restBtnsDiv = document.createElement('div');
+          restBtnsDiv.style.display = 'flex';
+          restBtnsDiv.style.gap = '0.3rem';
+          restBtnsDiv.append(btnRestStart, btnRestPause, btnRestResume, btnRestReset);
+
+          // Compose hold timer div
+          const holdTimerDiv = document.createElement('div');
+          holdTimerDiv.appendChild(document.createTextNode('Maintien : '));
+          holdTimerDiv.appendChild(holdDisplay);
+          holdTimerDiv.appendChild(holdBtnsDiv);
+
+          // Compose rest timer div
+          const restTimerDiv = document.createElement('div');
+          restTimerDiv.appendChild(document.createTextNode('Repos : '));
+          restTimerDiv.appendChild(restDisplay);
+          restTimerDiv.appendChild(restBtnsDiv);
+
+          const timersContainer = document.createElement('div');
+          timersContainer.style.display = 'flex';
+          timersContainer.style.flexDirection = 'column';
+          timersContainer.style.gap = '0.3rem';
+          timersContainer.style.flex = '1';
+
+          timersContainer.appendChild(holdTimerDiv);
+          timersContainer.appendChild(restTimerDiv);
+
+          seriesDiv.appendChild(timersContainer);
+        }
+
+        seriesList.appendChild(seriesDiv);
+      }
+
+      card.appendChild(seriesList);
+      section.appendChild(card);
+    });
+
+    // Reminder note for safety
+    const safetyNote = document.createElement('p');
+    safetyNote.textContent = "Important : échauffement des poignets et des épaules, progression graduelle, espace dégagé, apprentissage avec encadrement adapté.";
+    safetyNote.className = 'note';
+    safetyNote.style.marginTop = '1rem';
+    section.appendChild(safetyNote);
+
+    // Button for mastery progression
+    const masteryBtn = document.createElement('button');
+    masteryBtn.textContent = 'Étape maîtrisée, passer à la suivante';
+    masteryBtn.className = 'chrono-btn';
+    masteryBtn.style.marginTop = '1rem';
+    masteryBtn.addEventListener('click', () => {
+      const ci = progressionHandstand.currentStepIndex || 0;
+      if(ci < HANDSTAND_STEPS.length - 1){
+        progressionHandstand.currentStepIndex = ci + 1;
+        progressionHandstand.masteryConfirmed = true;
+        saveAllData();
+        alert(`Passage à l'étape ${ci+2} du handstand.`);
+        renderAllSections();
+      } else {
+        alert("Vous êtes déjà à la dernière étape du handstand.");
+      }
+    });
+    section.appendChild(masteryBtn);
+
+    return section;
+  }
+
+  /* 3. CALENDRIER ANNUEL */
+
+  // Create calendar UI with statuses
+  function renderCalendar(){
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+
+    mainContent.innerHTML = '';
+
+    // Container card
+    const container = document.createElement('section');
+    container.className = 'card';
+
+    // Header + year selector
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'flex-row space-between';
+    headerDiv.style.alignItems = 'center';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Calendrier annuel';
+
+    // Year selector
+    const yearSelect = document.createElement('select');
+    yearSelect.setAttribute('aria-label', 'Sélectionner une année pour le calendrier');
+    let currentYear = currentDate.getFullYear();
+    for(let y = currentYear - 3; y <= currentYear + 2; y++){
+      const option = document.createElement('option');
+      option.value = y;
+      option.textContent = y;
+      if(y === currentYear) option.selected = true;
+      yearSelect.appendChild(option);
+    }
+    yearSelect.addEventListener('change', () => {
+      currentYear = parseInt(yearSelect.value);
+      renderCalendarForYear(currentYear, container);
+    });
+
+    headerDiv.appendChild(title);
+    headerDiv.appendChild(yearSelect);
+    container.appendChild(headerDiv);
+
+    // Legend for calendar
+    const legend = document.createElement('div');
+    legend.id = 'legend';
+
+    legend.innerHTML = `
+      <div><span class="legend-box legend-mobility"></span>Mobilité validée</div>
+      <div><span class="legend-box legend-mobilrenf"></span>Mobilité + renforcement validés</div>
+      <div><span class="legend-box legend-rest"></span>Repos validé</div>
+      <div><span class="legend-box legend-incomplete"></span>Séance commencée mais incomplète</div>
+      <div><span class="legend-box" style="background:#FFFCF7; border-color:#E6D5C3;"></span>Journée non renseignée</div>
+    `;
+    container.appendChild(legend);
+
+    mainContent.appendChild(container);
+    renderCalendarForYear(currentYear, container);
+  }
+  // Helper: render calendar grid for one year
+  function renderCalendarForYear(year, container){
+    // Remove old calendar grid if any
+    const oldGrid = container.querySelector('.calendar-grid');
+    if(oldGrid) oldGrid.remove();
+
+    // Compute start date (Monday of week 1 ISO or 4 Jan first)
+    // We'll build week by week for 53 weeks (max)
+
+    // Get first Monday of ISO year (week starts Monday)
+    function getFirstMondayOfISOYear(y){
+      const jan4 = new Date(y,0,4);
+      let day = jan4.getDay(); // 0 Sunday..6 Sat
+      day = (day === 0) ? 7 : day; // Mon=1..Sun=7;
+      const diff = 1 - day; // offset to Monday before or after 4th Jan
+      return new Date(y,0,4 + diff);
+    }
+
+    const firstMonday = getFirstMondayOfISOYear(year);
+
+    // Build container div grid
+    const grid = document.createElement('div');
+    grid.className = 'calendar-grid';
+    grid.setAttribute('role', 'grid');
+    grid.setAttribute('aria-rowcount', 7);
+    grid.style.gridTemplateRows = 'repeat(7, 14px)';
+    grid.style.gridTemplateColumns = 'repeat(53, 14px)';
+    grid.style.gap = '3px';
+
+    // Weekday labels on left side: Mon .. Sun, small font, vertical alignment
+    // We'll add these as first column (but for simplicity we can add above or next to grid)
+
+    // Build day squares for entire year days + empty leading and trailing squares for calendar alignment
+
+    // Create a map from dateStr to validation state for the year
+    const validationMap = {};
+    for(let month=0; month<12; month++){
+      const dim = daysInMonth(year,month);
+      for(let day=1; day<=dim; day++){
+        const dStr = `${year.toString().padStart(4,'0')}-${(month+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`;
+        validationMap[dStr] = validateDay(dStr);
+      }
+    }
+
+    // Add empty cells for the days before 1 January to align calendar to monday start
+    // Also days before firstMonday?
+
+    // Build set of invalid dates to exclude (before 1 Jan of year or after 31 Dec)
+
+    // Actually, alignment will reflect the calendar weeks from firstMonday for 53 weeks.
+
+    // To allow click on days:
+    function onClickCalendarDay(e){
+      const dateStr = e.target.getAttribute('data-date');
+      if(!dateStr) return;
+      const d = parseDate(dateStr);
+      if(!d) return;
+      currentDate = d;
+      currentSection = 'programme';
+      renderAllSections();
+    }
+
+    // For each week and each day of week (Mon-Sun), create day squares
+    for(let week=0; week<53; week++){
+      for(let wd=1; wd<=7; wd++){
+        // Calculate date for this cell:
+        let dayDate = new Date(firstMonday.getTime());
+        dayDate.setDate(firstMonday.getDate() + week*7 + wd - 1);
+        const isInYear = dayDate.getFullYear() === year;
+
+        const daySquare = document.createElement('button');
+        daySquare.type = 'button';
+        daySquare.className = 'calendar-day';
+        daySquare.tabIndex = isInYear ? 0 : -1;
+        daySquare.setAttribute('aria-label', isInYear ? `Jour ${formatDateFR(dayDate)}` : '');
+        daySquare.setAttribute('data-date', isInYear ? formatDate(dayDate) : '');
+        daySquare.style.borderRadius = '6px';
+        daySquare.style.width = '14px';
+        daySquare.style.height= '14px';
+        daySquare.style.padding = '0';
+        daySquare.style.border = 'none';
+        daySquare.style.background = COLORS.ivoire;
+        daySquare.style.border = `1px solid ${COLORS.beige_sable}`;
+        daySquare.style.cursor = isInYear ? 'pointer' : 'default';
+
+        if(!isInYear){
+          daySquare.style.visibility = 'hidden';
+        } else {
+          const status = validationMap[formatDate(dayDate)] || 'none';
+          daySquare.classList.remove('inactive','mobility','mobil+renf','rest','incomplete','today');
+          if(status === 'mobility') daySquare.classList.add('mobility');
+          else if(status === 'mobil+renf') daySquare.classList.add('mobil+renf');
+          else if(status === 'rest') daySquare.classList.add('rest');
+          else if(status === 'incomplete') daySquare.classList.add('incomplete');
+          if(formatDate(getTodayDate()) === formatDate(dayDate)){
+            daySquare.classList.add('today');
+            daySquare.setAttribute('aria-current','date');
+          }
+          // When clicked, go to that date and open programme
+          daySquare.addEventListener('click', onClickCalendarDay);
+          // keyboard enter/space handled by button default
+        }
+        // Place day square
+        daySquare.style.gridColumnStart = week+1;
+        daySquare.style.gridRowStart = wd;
+        grid.appendChild(daySquare);
+      }
+    }
+
+    // Add weekday labels (Mon..Sun) on left
+    const labelsContainer = document.createElement('div');
+    labelsContainer.style.display = 'grid';
+    labelsContainer.style.gridTemplateRows = 'repeat(7, 14px)';
+    labelsContainer.style.gridRowGap = '3px';
+    labelsContainer.style.marginRight = '6px';
+    labelsContainer.style.fontSize = '9px';
+    labelsContainer.style.color = COLORS.marron_bois;
+    labelsContainer.style.userSelect = 'none';
+    const dayNamesShort = ['L','M','M','J','V','S','D'];
+
+    dayNamesShort.forEach((d,i) => {
+      const dEl = document.createElement('div');
+      dEl.textContent = d;
+      dEl.style.textAlign = 'center';
+      dEl.style.lineHeight = '12px';
+      labelsContainer.appendChild(dEl);
+    });
+
+    const calendarWrapper = document.createElement('div');
+    calendarWrapper.style.display = 'flex';
+    calendarWrapper.appendChild(labelsContainer);
+    calendarWrapper.appendChild(grid);
+
+    // Month labels
+    const monthsLabelContainer = document.createElement('div');
+    monthsLabelContainer.className = 'calendar-month-labels';
+    monthsLabelContainer.style.marginBottom = '0.3rem';
+
+    // We want to place month names above first occurrences of month in calendar columns
+    // Compute first week number for each month of the year using ISO weeks
+
+    for(let m = 0; m<12; m++){
+      const firstDayMonth = new Date(year,m,1);
+      // Calculate week number (ISO) for first day of month
+      let weekNumber = getISOWeekNumber(firstDayMonth).week;
+      if(m===0 && weekNumber > 50) weekNumber = 1; // correct edge case for Jan first week starting in Dec previous year
+      // place the month label at the grid column = weekNumber
+      const monthName = firstDayMonth.toLocaleString('fr-FR', {month: 'short'});
+      const monthSpan = document.createElement('div');
+      monthSpan.textContent = monthName;
+      monthSpan.style.gridColumnStart = weekNumber;
+      monthSpan.style.gridColumnEnd = weekNumber + 5;
+      monthSpan.style.color = COLORS.marron_bois;
+      monthSpan.style.fontWeight = '600';
+      monthsLabelContainer.appendChild(monthSpan);
+    }
+
+    container.innerHTML = '';
+    container.appendChild(monthsLabelContainer);
+    container.appendChild(calendarWrapper);
+
+    // Show summary of days validated stats
+    const stats = getCalendarYearStats(year);
+
+    const statsDiv = document.createElement('div');
+    statsDiv.style.marginTop = '1rem';
+    statsDiv.style.fontSize = '0.9rem';
+    statsDiv.style.color = COLORS.marron_fonce;
+    statsDiv.innerHTML = `
+      <strong>Année ${year}</strong> :
+      <br>Jours validés : ${stats.totalValidated} / 365${isLeapYear(year)?'+1 (année bissextile)':''}
+      <br>Mobilité uniquement : ${stats.mobilityCount}
+      <br>Mobilité + renforcement : ${stats.mobilRenfCount}
+      <br>Repos respectés : ${stats.restCount}
+      <br>Séances incomplètes : ${stats.incompleteCount}
+    `;
+    container.appendChild(statsDiv);
+  }
+
+  // Compute yearly stats for calendar summary
+  function getCalendarYearStats(year){
+    const stats = {
+      totalValidated: 0,
+      mobilityCount: 0,
+      mobilRenfCount: 0,
+      restCount: 0,
+      incompleteCount: 0,
+    };
+    for(let month=0; month<12; month++){
+      const dim = daysInMonth(year, month);
+      for(let d=1; d<=dim; d++){
+        const dStr = `${year.toString().padStart(4,'0')}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+        const val = validateDay(dStr);
+        if(val === 'mobility'){
+          stats.totalValidated++;
+          stats.mobilityCount++;
+        } else if(val === 'mobil+renf'){
+          stats.totalValidated++;
+          stats.mobilRenfCount++;
+        } else if(val === 'rest'){
+          stats.totalValidated++;
+          stats.restCount++;
+        } else if(val === 'incomplete'){
+          stats.incompleteCount++;
+        }
+      }
+    }
+    return stats;
+  }
+
+  /* 4. PROGRESSIONS */
+
+  function renderProgressions(){
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+    mainContent.innerHTML = '';
+
+    // Container card
+    const container = document.createElement('section');
+    container.className = 'card';
+
+    // Title
+    const title = document.createElement('h2');
+    title.textContent = 'Progressions';
+
+    container.appendChild(title);
+
+    // --- Pompes timeline ---
+    const pompesDiv = document.createElement('section');
+    pompesDiv.setAttribute('aria-label', 'Progression des pompes');
+    pompesDiv.style.marginTop = '1rem';
+
+    const pompesTitle = document.createElement('h3');
+    pompesTitle.textContent = 'Pompes sur les genoux';
+    pompesDiv.appendChild(pompesTitle);
+
+    const pompesStartDate = meta.programStartDate || formatDate(getTodayDate());
+
+    const weekCountSinceStart = weeksSinceStart();
+    const pompesCurrentStep = progressionPompes.currentStepIndex || 0;
+    const isMastered = progressionPompes.masteryConfirmed;
+
+    const pompesList = document.createElement('ol');
+    pompesList.style.lineHeight = '1.3';
+    pompesList.style.color = COLORS.marron_bois;
+    pompesList.style.fontWeight = '600';
+
+    POMPES_STEPS.forEach((step, idx) => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '0.3rem';
+      if(idx === pompesCurrentStep){
+        li.style.backgroundColor = COLORS.rose_pale;
+        li.style.padding = '0.3rem 0.6rem';
+        li.style.borderRadius = '12px';
+      }
+      li.textContent = `Étape ${idx+1}: ${step.series} séries de ${step.repsRange[0]} à ${step.repsRange[1]} pompes ${step.type ? '('+step.type+')' : 'sur les genoux'}`;
+      if(idx == pompesCurrentStep) li.innerHTML += `<br><small>Date début : ${pompesStartDate} | Semaine courante: ${weekCountSinceStart}</small>`;
+      pompesList.appendChild(li);
+    });
+    pompesDiv.appendChild(pompesList);
+
+    // Button to confirm mastery & go next step
+    const btnNextStage = document.createElement('button');
+    btnNextStage.textContent = 'Étape maîtrisée, passer à la suivante';
+    btnNextStage.className = 'chrono-btn';
+    btnNextStage.addEventListener('click', () => {
+      const ci = progressionPompes.currentStepIndex || 0;
+      if(ci < POMPES_STEPS.length - 1){
+        progressionPompes.currentStepIndex = ci + 1;
+        progressionPompes.masteryConfirmed = true;
+        if(!meta.programStartDate) meta.programStartDate = formatDate(getTodayDate());
+        saveAllData();
+        alert(`Passage à l'étape ${ci+2} des pompes.`);
+        renderAllSections();
+      } else {
+        alert("Vous êtes déjà à la dernière étape des pompes.");
+      }
+    });
+    pompesDiv.appendChild(btnNextStage);
+
+    container.appendChild(pompesDiv);
+
+    // --- Planche timeline ---
+    const plancheDiv = document.createElement('section');
+    plancheDiv.setAttribute('aria-label', 'Progression du gainage');
+    plancheDiv.style.marginTop = '2rem';
+
+    const plancheTitle = document.createElement('h3');
+    plancheTitle.textContent = 'Gainage - planche';
+    plancheDiv.appendChild(plancheTitle);
+
+    const plancheStartDate = meta.programStartDate || formatDate(getTodayDate());
+    const plancheCurrentStep = progressionPlanche.currentStepIndex || 0;
+    const plancheMastered = progressionPlanche.masteryConfirmed || false;
+
+    const plancheList = document.createElement('ol');
+    plancheList.style.lineHeight = '1.3';
+    plancheList.style.color = COLORS.marron_bois;
+    plancheList.style.fontWeight = '600';
+
+    PLANCHE_STEPS.forEach((step, idx)=>{
+      const li = document.createElement('li');
+      li.style.marginBottom = '0.3rem';
+      let desc = '';
+      if(step.seconds) desc = `${step.series} séries de ${step.seconds} secondes`;
+      else if(step.secondsRange) desc = `${step.series} séries de ${step.secondsRange[0]} à ${step.secondsRange[1]} secondes`;
+      li.textContent = `Étape ${idx+1}: ${desc}`;
+      if(idx === plancheCurrentStep){
+        li.style.backgroundColor = COLORS.rose_pale;
+        li.style.padding = '0.3rem 0.6rem';
+        li.style.borderRadius = '12px';
+        if(step.secondsRange && progressionPlanche.secondsChosen){
+          li.innerHTML += `<br><small>Durée choisie: ${progressionPlanche.secondsChosen} secondes</small>`;
+        }
+      }
+      plancheList.appendChild(li);
+    });
+    plancheDiv.appendChild(plancheList);
+
+    // Button to confirm mastery & go next step
+    const btnNextStagePlanche = document.createElement('button');
+    btnNextStagePlanche.textContent = 'Étape maîtrisée, passer à la suivante';
+    btnNextStagePlanche.className = 'chrono-btn';
+    btnNextStagePlanche.addEventListener('click', () => {
+      const ci = progressionPlanche.currentStepIndex || 0;
+      if(ci < PLANCHE_STEPS.length - 1){
+        progressionPlanche.currentStepIndex = ci + 1;
+        progressionPlanche.secondsChosen = null; // reset
+        progressionPlanche.masteryConfirmed = true;
+        if(!meta.programStartDate) meta.programStartDate = formatDate(getTodayDate());
+        saveAllData();
+        alert(`Passage à l'étape ${ci+2} du gainage.`);
+        renderAllSections();
+      } else {
+        alert("Vous êtes déjà à la dernière étape du gainage.");
+      }
+    });
+    plancheDiv.appendChild(btnNextStagePlanche);
+
+    container.appendChild(plancheDiv);
+
+    // --- Handstand timeline ---
+    const handstandDiv = document.createElement('section');
+    handstandDiv.setAttribute('aria-label', 'Progression Handstand / ATR');
+    handstandDiv.style.marginTop = '2rem';
+
+    const handstandTitle = document.createElement('h3');
+    handstandTitle.textContent = 'Progression Handstand / ATR';
+    handstandDiv.appendChild(handstandTitle);
+
+    const handstandStartDate = meta.programStartDate || formatDate(getTodayDate());
+    const handstandCurrentStep = progressionHandstand.currentStepIndex || 0;
+    const handstandMastered = progressionHandstand.masteryConfirmed || false;
+
+    const handstandList = document.createElement('ol');
+    handstandList.style.lineHeight = '1.3';
+    handstandList.style.color = COLORS.marron_bois;
+    handstandList.style.fontWeight = '600';
+
+    HANDSTAND_STEPS.forEach((step, idx) => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '0.3rem';
+
+      let textStatus = idx === handstandCurrentStep ? '(Étape active)' : '';
+      li.textContent = `Étape ${idx+1}: ${step.title} ${textStatus}`;
+      const desc = document.createElement('p');
+      desc.style.fontWeight = '400';
+      desc.style.color = COLORS.marron_fonce;
+      desc.textContent = step.desc;
+      li.appendChild(desc);
+
+      // Checkbox to mark stage acquired
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.id = `handstand-step-${idx}`;
+      chk.checked = idx <= handstandCurrentStep;
+      chk.setAttribute('aria-label', `Marquer l'étape ${idx+1} comme acquise`);
+      chk.addEventListener('change', e => {
+        if(e.target.checked){
+          if(idx > progressionHandstand.currentStepIndex){
+            progressionHandstand.currentStepIndex = idx;
+            progressionHandstand.masteryConfirmed = true;
+            saveAllData();
+            renderProgressions();
+          }
+        } else {
+          if(idx === progressionHandstand.currentStepIndex){
+            // Can't uncheck current step; force checked
+            alert("Impossible de décocher l'étape active.");
+            e.target.checked = true;
+          }
+        }
+      });
+
+      li.appendChild(chk);
+      handstandList.appendChild(li);
+    });
+    handstandDiv.appendChild(handstandList);
+
+    // Button to go next step manually
+    const btnHandstandNext = document.createElement('button');
+    btnHandstandNext.textContent = 'Étape maîtresse, passer à la suivante';
+    btnHandstandNext.className = 'chrono-btn';
+    btnHandstandNext.addEventListener('click', () => {
+      const ci = progressionHandstand.currentStepIndex || 0;
+      if(ci < HANDSTAND_STEPS.length - 1){
+        progressionHandstand.currentStepIndex = ci + 1;
+        progressionHandstand.masteryConfirmed = true;
+        if(!meta.programStartDate) meta.programStartDate = formatDate(getTodayDate());
+        saveAllData();
+        alert(`Passage à l'étape ${ci+2} du handstand.`);
+        renderAllSections();
+      } else {
+        alert("Vous êtes déjà à la dernière étape du handstand.");
+      }
+    });
+    handstandDiv.appendChild(btnHandstandNext);
+
+    container.appendChild(handstandDiv);
+
+    mainContent.appendChild(container);
+
+  }
+
+  /* 5. STATISTIQUES */
+
+  // Compute stats based on stored data
+  function renderStatistics(){
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+    mainContent.innerHTML = '';
+
+    const container = document.createElement('section');
+    container.className = 'card';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Statistiques et suivi';
+    container.appendChild(title);
+
+    // Time now
+    const today = getTodayDate();
+
+    // Helper to get calendar stats for current year
+    const year = today.getFullYear();
+    const allStats = getCalendarYearStats(year);
+
+    // Stats for this week & this month
+    // For week - count validated days this week (already have countValidatedDaysCurrentWeek)
+    const validatedWeek = countValidatedDaysCurrentWeek();
+
+    // For month - count validated days this month:
+    const currentMonth = today.getMonth();
+    let validatedMonth = 0;
+    for(let d=1; d<=daysInMonth(year,currentMonth); d++){
+      const dStr = `${year.toString().padStart(4,'0')}-${(currentMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+      const val = validateDay(dStr);
+      if(val === 'mobility' || val === 'mobil+renf' || val === 'rest') validatedMonth++;
+    }
+
+    // Total sessions validées
+    const totalValidated = allStats.totalValidated;
+
+    // Calculate rate of completion: total completed / (total days lapsed since program start)
+    let rateCompletion = 0;
+    if(meta.programStartDate){
+      let start = parseDate(meta.programStartDate);
+      if(start <= today){
+        let countDays = 0;
+        let countCompleted = 0;
+        for(let d=start.getTime(); d <= today.getTime(); d += 86400000){
+          const dDate = new Date(d);
+          const dStr = formatDate(dDate);
+          const val = validateDay(dStr);
+          if(WEEK_SCHEDULE[dDate.getDay()] === 'rest'){
+            // count rest days
+            countDays++;
+            if(val === 'rest') countCompleted++;
+          } else {
+            if(val === 'mobility' || val === 'mobil+renf'){
+              countDays++;
+              countCompleted++;
+            } else if(val === 'incomplete'){
+              countDays++;
+            } else {
+              countDays++;
+            }
+          }
+        }
+        rateCompletion = countDays ? ((countCompleted / countDays)*100).toFixed(1) : 0;
+      }
+    }
+
+    // Last date trained (reverse iterate)
+    let lastDateTrained = null;
+    const programStart = meta.programStartDate ? parseDate(meta.programStartDate) : null;
+    if(programStart){
+      let dayIter = today;
+      while(dayIter >= programStart){
+        const dStr = formatDate(dayIter);
+        const val = validateDay(dStr);
+        if(val === 'mobility' || val === 'mobil+renf' || val === 'rest'){
+          lastDateTrained = dStr;
+          break;
+        }
+        dayIter = incrementDate(dayIter, -1);
+      }
+    }
+
+    // Cards grid for stats
+    const statsGrid = document.createElement('div');
+    statsGrid.style.display = 'grid';
+    statsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px,1fr))';
+    statsGrid.style.gap = '1rem';
+
+    function createStatCard(label, value){
+      const card = document.createElement('div');
+      card.style.backgroundColor = COLORS.ivoire;
+      card.style.border = `1px solid ${COLORS.beige_sable}`;
+      card.style.borderRadius = '14px';
+      card.style.padding = '1rem';
+      card.style.boxShadow = `0 3px 6px rgb(139 111 87 / 0.15)`;
+      const labelEl = document.createElement('div');
+      labelEl.textContent = label;
+      labelEl.style.color = COLORS.marron_bois;
+      labelEl.style.fontWeight = '600';
+      labelEl.style.marginBottom = '0.4rem';
+      const valueEl = document.createElement('div');
+      valueEl.textContent = value;
+      valueEl.style.fontSize = '1.3rem';
+      valueEl.style.color = COLORS.marron_fonce;
+      card.appendChild(labelEl);
+      card.appendChild(valueEl);
+      return card;
+    }
+
+    statsGrid.appendChild(createStatCard('Séances validées cette semaine', validatedWeek));
+    statsGrid.appendChild(createStatCard('Séances validées ce mois-ci', validatedMonth));
+    statsGrid.appendChild(createStatCard('Total des séances validées cette année', totalValidated));
+    statsGrid.appendChild(createStatCard('Séances mobilité réussies', allStats.mobilityCount));
+    statsGrid.appendChild(createStatCard('Séances renforcement réussies', allStats.mobilRenfCount));
+    statsGrid.appendChild(createStatCard('Jours de repos respectés', allStats.restCount));
+    statsGrid.appendChild(createStatCard('Taux de complétion global (%)', rateCompletion));
+    statsGrid.appendChild(createStatCard('Dernière date d\'entraînement validée', lastDateTrained || 'Aucune'));
+
+    container.appendChild(statsGrid);
+
+    mainContent.appendChild(container);
+  }
+
+  /* 6. REST DAY */
+
+  function renderRestDay(container, dateStr){
+    // For Sunday: display calm interface with confirm rest checkbox and validate btn
+
+    document.body.classList.add('rest-day');
+
+    // Clean container
+    container.innerHTML = '';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Rest & Recovery';
+    container.appendChild(title);
+
+    const message = document.createElement('p');
+    message.textContent = 'Aujourd’hui, priorité à la récupération.';
+    message.style.marginTop = '1rem';
+    container.appendChild(message);
+
+    // SVG illustrative decoration (simple gentle sun)
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute('class', 'rest-illustration');
+    svg.setAttribute('viewBox', '0 0 64 64');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.style.margin = '1rem auto';
+    svg.style.display = 'block';
+    svg.style.maxWidth = '180px';
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute('cx','32');
+    circle.setAttribute('cy','32');
+    circle.setAttribute('r','14');
+    circle.setAttribute('stroke-linecap','round');
+    circle.setAttribute('fill','none');
+    circle.setAttribute('stroke','currentColor');
+    circle.setAttribute('stroke-width','3');
+    svg.appendChild(circle);
+    container.appendChild(svg);
+
+    // Checkbox to confirm rest respected
+    const label = document.createElement('label');
+    label.htmlFor = 'restDayCheckbox';
+    label.style.fontWeight = '600';
+    label.style.marginTop = '1.2rem';
+    label.textContent = 'J’ai respecté mon jour de repos';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'restDayCheckbox';
+    checkbox.checked = getDayData(dateStr).restConfirmed || false;
+    checkbox.style.marginLeft = '0.8rem';
+    checkbox.setAttribute('aria-label', "Confirmer le respect du jour de repos");
+    checkbox.addEventListener('change', e => {
+      const d = getDayData(dateStr);
+      d.restConfirmed = e.target.checked;
+      setDayData(dateStr, d);
+      renderHeader();
+    });
+    label.appendChild(checkbox);
+    container.appendChild(label);
+
+    // Validate button to save data and update calendar
+    const btnValidate = document.createElement('button');
+    btnValidate.textContent = 'Valider ma journée de repos';
+    btnValidate.className = 'chrono-btn';
+    btnValidate.style.display = 'block';
+    btnValidate.style.marginTop = '1.5rem';
+    btnValidate.addEventListener('click', () => {
+      const d = getDayData(dateStr);
+      if(!d.restConfirmed){
+        alert("Veuillez cocher la confirmation du jour de repos.");
+        return;
+      }
+      setDayData(dateStr, d);
+      alert("Journée de repos validée.");
+      renderHeader();
+      renderCalendar();
+    });
+    container.appendChild(btnValidate);
+
+  }
+  /* 7. CHRONOMETRES FUNCTIONALITY */
+
+  /*
+    Timers object keys:
+    timerId: {
+      intervalId,
+      running,
+      startTs,
+      remainingMs,
+      endTs,
+      isCountdown,
+      callback,
+      pausedAt,
+    }
+  */
+
+  // Start timer with id and durationMs and a callback rem, ended
+  function startTimer(timerId, durationMs, callback){
+    if(!timers) timers = {};
+    stopTimer(timerId);
+    const now = Date.now();
+    timers[timerId] = {
+      running: true,
+      startTs: now,
+      remainingMs: durationMs,
+      endTs: now + durationMs,
+      isCountdown: true,
+      callback,
+      pausedAt: null,
+      intervalId: null
+    };
+    // Immediate call
+    timers[timerId].callback(durationMs, false);
+
+    timers[timerId].intervalId = setInterval(() => {
+      const t = timers[timerId];
+      if(!t || !t.running) return;
+      const now = Date.now();
+      t.remainingMs = t.endTs - now;
+      if(t.remainingMs <= 0){
+        t.remainingMs = 0;
+        stopTimer(timerId);
+        if(t.callback) t.callback(0, true);
+      } else {
+        if(t.callback) t.callback(t.remainingMs, false);
+      }
+    }, 250);
+  }
+  function pauseTimer(timerId){
+    const t = timers[timerId];
+    if(!t) return;
+    if(!t.running) return;
+    t.pausedAt = Date.now();
+    t.remainingMs = t.endTs - t.pausedAt;
+    clearInterval(t.intervalId);
+    t.running = false;
+  }
+  function resumeTimer(timerId){
+    const t = timers[timerId];
+    if(!t) return;
+    if(t.running) return;
+    const now = Date.now();
+    t.startTs = now;
+    t.endTs = now + t.remainingMs;
+    t.pausedAt = null;
+    t.running = true;
+    t.intervalId = setInterval(() => {
+      const now = Date.now();
+      t.remainingMs = t.endTs - now;
+      if(t.remainingMs <= 0){
+        t.remainingMs = 0;
+        stopTimer(timerId);
+        if(t.callback) t.callback(0, true);
+      } else {
+        if(t.callback) t.callback(t.remainingMs, false);
+      }
+    }, 250);
+  }
+  // Stop and clear timer
+  function stopTimer(timerId){
+    const t = timers[timerId];
+    if(t && t.intervalId){
+      clearInterval(t.intervalId);
+      timers[timerId] = null;
+    }
+  }
+
+  /* 8. NAVIGATION BUTTONS & USER INTERACTIONS */
+
+  function setupNavigation(){
+    // Prev day
+    const btnPrev = document.getElementById('btnPrevDay');
+    btnPrev.addEventListener('click', () => {
+      currentDate = incrementDate(currentDate, -1);
+      loadAndRenderDate(currentDate);
+      renderAllSections();
+    });
+    // Next day
+    const btnNext = document.getElementById('btnNextDay');
+    btnNext.addEventListener('click', () => {
+      // Do not go beyond today
+      if(currentDate < getTodayDate()){
+        currentDate = incrementDate(currentDate, 1);
+        loadAndRenderDate(currentDate);
+        renderAllSections();
+      }
+    });
+    // Today
+    const btnToday = document.getElementById('btnToday');
+    btnToday.addEventListener('click', () => {
+      currentDate = getTodayDate();
+      loadAndRenderDate(currentDate);
+      renderAllSections();
+    });
+  }
+
+  // Navigation tabs
+  function setupSectionNavigation(){
+    const ids = ['Dashboard','Programme','Calendar','Progressions','Stats'];
+    ids.forEach(id => {
+      const btn = document.getElementById(`nav${id}`);
+      if(!btn) return;
+      btn.addEventListener('click', () => {
+        currentSection = id.toLowerCase();
+        if(currentSection === 'programme'){
+          loadAndRenderDate(currentDate);
+        }
+        renderAllSections();
+      });
+    });
+  }
+  /* 9. LOAD & RENDER DATE'S DATA */
+
+  // Load data and set header and UI for date
+  function loadAndRenderDate(date){
+    renderHeader();
+    renderAllSections();
+  }
+
+  /* MODAL for export/import */
+
+  function openModal(title, content, showTextarea=false){
+    const overlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const modalTextareaContainer = document.getElementById('modalInputContainer');
+    const modalTextarea = document.getElementById('modalTextarea');
+    if(!overlay || !modalTitle || !modalText || !modalTextareaContainer || !modalTextarea) return;
+
+    modalTitle.textContent = title;
+    modalText.textContent = showTextarea ? '' : content;
+    modalText.style.display = showTextarea ? 'none' : 'block';
+    modalTextareaContainer.style.display = showTextarea ? 'block' : 'none';
+
+    if(showTextarea) modalTextarea.value = '';
+
+    overlay.classList.add('active');
+    overlay.focus();
+  }
+  function closeModal(){
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.remove('active');
+  }
+
+  // Modal close button
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+
+  /* EXPORT / IMPORT HANDLERS */
+
+  function setupExportImportButtons(){
+    // Add buttons at bottom of dashboard section (or mobile nav)
+
+    const mainContent = document.getElementById('mainContent');
+    if(!mainContent) return;
+
+    // Create container buttons
+    const divBtns = document.createElement('div');
+    divBtns.style.marginTop = '2rem';
+    divBtns.style.display = 'flex';
+    divBtns.style.justifyContent = 'center';
+    divBtns.style.gap = '1rem';
+
+    // Export button
+    const btnExport = document.createElement('button');
+    btnExport.textContent = 'Exporter mes données JSON';
+    btnExport.className = 'chrono-btn';
+    btnExport.addEventListener('click', () => {
+      const jsonStr = exportData();
+      openModal('Export des données JSON', jsonStr, false);
+    });
+
+    // Import button
+    const btnImport = document.createElement('button');
+    btnImport.textContent = 'Importer des données JSON';
+    btnImport.className = 'chrono-btn';
+    btnImport.addEventListener('click', () => {
+      openModal('Importer des données JSON', '', true);
+      // Setup textarea submit on modal Close
+      const modalTextarea = document.getElementById('modalTextarea');
+      modalTextarea.focus();
+      modalTextarea.parentElement.querySelector('textarea').focus();
+    });
+
+    // Reset button
+    const btnReset = document.createElement('button');
+    btnReset.textContent = 'Réinitialiser mes données';
+    btnReset.className = 'chrono-btn';
+    btnReset.addEventListener('click', () => {
+      clearAllData();
+    });
+
+    divBtns.appendChild(btnExport);
+    divBtns.appendChild(btnImport);
+    divBtns.appendChild(btnReset);
+
+    mainContent.appendChild(divBtns);
+  }
+
+  // After modal open for import, setup event on textarea confirm on Enter + Ctrl
+  document.getElementById('modalTextarea').addEventListener('keydown', (e) => {
+    if(e.ctrlKey && e.key.toLowerCase() === 'enter'){
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if(val){
+        importData(val);
+      } else {
+        alert('Veuillez coller vos données JSON dans la zone de texte.');
+      }
+    }
+  });
+
+  /* INITIALIZATION */
+
+  function init(){
+    loadAllData();
+    currentDate = getTodayDate();
+    // If no programStartDate, set to today
+    if(!meta.programStartDate){
+      meta.programStartDate = formatDate(currentDate);
+      saveAllData();
+    }
+
+    renderAllSections();
+    renderHeader();
+    setupNavigation();
+    setupSectionNavigation();
+    setupExportImportButtons();
+
+    // Accessibility focus trap or fallbacks can be added here
+
+    // Inform localStorage note
+    const footerNote = document.createElement('p');
+    footerNote.textContent = "Les données sont sauvegardées localement dans ce navigateur. Elles ne sont pas synchronisées automatiquement entre appareils.";
+    footerNote.style.fontSize = '0.8rem';
+    footerNote.style.marginTop = '2rem';
+    footerNote.style.textAlign = 'center';
+    footerNote.style.color = COLORS.marron_fonce;
+    footerNote.style.userSelect = 'none';
+
+    const app = document.getElementById('app');
+    app.appendChild(footerNote);
+  }
+
+  // Run on DOM ready
+  document.addEventListener('DOMContentLoaded', init);
+
+})();
+
+</script>
+</body>
+</html>
